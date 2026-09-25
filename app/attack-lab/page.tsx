@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 type Row = { skenario: string; dokumen: string; hasil: "LOLOS" | "DITOLAK"; detail: string };
-
-const inputCls = "w-full rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
 
 async function verifyFile(f: Blob, name: string, extra?: Record<string, string>) {
   const fd = new FormData();
@@ -56,7 +55,7 @@ export default function AttackLabPage() {
     } catch (e) { setErr((e as Error).message); } finally { setBusy(""); }
   }
 
-  /** §3.5 uji tamper —ubah satu karakter teks via pdf-lib di browser, lalu verifikasi. */
+  /** §3.5 uji tamper — ubah satu karakter teks via pdf-lib di browser, lalu verifikasi. */
   async function runTamper() {
     setErr("");
     if (!signedFile) return setErr("Unggah PDF yang sudah ditandatangani");
@@ -142,66 +141,84 @@ export default function AttackLabPage() {
   }
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-2xl font-semibold">Pengujian Wajib &amp; Attack Lab</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        TASK.md §3.5: timing ≥30 percobaan, ukuran signature/public key, uji tamper, uji kunci salah,
-        uji QR dipalsukan. Jalankan tiap skenario lalu ekspor tabel ke XLSX.
-      </p>
+    <div>
+      <PageHead
+        step="Langkah 05 — Attack Lab"
+        title="Uji keras: serang sistem sendiri"
+        sub="Benchmark timing ≥30 percobaan, ukuran signature & public key, lalu tiga skenario serangan wajib: dokumen di-tamper, verifikasi dengan kunci salah, dan QR-Code dipalsukan. Setiap serangan yang LOLOS berarti sistem berhasil menolaknya."
+      />
 
-      <section className="mt-8 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="font-medium">A. Benchmark sign/verify (rata-rata ≥30 percobaan)</h2>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <label className="text-sm">Dokumen uji<input type="file" accept="application/pdf" className={inputCls} onChange={(e) => setBmDoc(e.target.files?.[0] ?? null)} /></label>
-          <label className="text-sm">Private key .dsk<input type="file" className={inputCls} onChange={(e) => setBmKey(e.target.files?.[0] ?? null)} /></label>
-          <label className="text-sm">Passphrase<input type="password" className={inputCls} value={bmPass} onChange={(e) => setBmPass(e.target.value)} /></label>
-          <label className="text-sm">Iterasi<input type="number" min={30} max={500} className={inputCls} value={bmIters} onChange={(e) => setBmIters(e.target.value)} /></label>
-        </div>
-        <button onClick={runBenchmark} disabled={!!busy} className="mt-3 rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900">
-          {busy === "benchmark" ? "Mengukur…" : "Jalankan Benchmark"}
-        </button>
-        {bmResult && (
-          <pre className="mt-3 overflow-auto rounded bg-zinc-100 p-3 text-xs dark:bg-zinc-900">{JSON.stringify(bmResult, null, 2)}</pre>
-        )}
-      </section>
-
-      <section className="mt-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
-        <h2 className="font-medium">B–D. Skenario serangan (butuh PDF bertanda tangan)</h2>
-        <label className="mt-3 block text-sm">PDF bertanda tangan<input type="file" accept="application/pdf" className={inputCls} onChange={(e) => setSignedFile(e.target.files?.[0] ?? null)} /></label>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button onClick={runTamper} disabled={!!busy} className="rounded border border-zinc-400 px-3 py-2 text-sm disabled:opacity-50">{busy === "tamper" ? "…" : "✏️ Uji tamper 1 karakter"}</button>
-          <button onClick={runWrongKey} disabled={!!busy} className="rounded border border-zinc-400 px-3 py-2 text-sm disabled:opacity-50">{busy === "wrongkey" ? "…" : "🔑 Uji kunci publik salah"}</button>
-          <button onClick={runForgedQr} disabled={!!busy} className="rounded border border-zinc-400 px-3 py-2 text-sm disabled:opacity-50">{busy === "forgedqr" ? "…" : "🖼️ Uji QR dipalsukan"}</button>
-        </div>
-      </section>
-
-      {err && <p className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">{err}</p>}
-
-      {rows.length > 0 && (
-        <section className="mt-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-medium">Tabel hasil pengujian</h2>
-            <button onClick={exportXlsx} className="rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white">⬇ Export XLSX</button>
+      <div className="space-y-6">
+        <Panel title="A · Benchmark sign & verify" desc="Mengukur rata-rata waktu sign/verify ECDSA P-256 atas dokumen yang sama, plus ukuran artefak kunci.">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <FileField label="Dokumen uji" accept="application/pdf" onChange={setBmDoc} fileName={bmDoc?.name ?? null} hint="Belum ada PDF dipilih" />
+            <FileField label="Private key .dsk" onChange={setBmKey} fileName={bmKey?.name ?? null} hint="Belum ada .dsk dipilih" />
+            <TextField label="Passphrase" type="password" value={bmPass} onChange={setBmPass} placeholder="••••••••" />
+            <label className="block">
+              <span className="lbl">Iterasi (30–500)</span>
+              <input className="field" type="number" min={30} max={500} value={bmIters} onChange={(e) => setBmIters(e.target.value)} />
+            </label>
           </div>
-          <table className="mt-3 w-full border-collapse text-sm">
-            <thead>
-              <tr className="border-b border-zinc-300 text-left dark:border-zinc-700">
-                <th className="py-2 pr-2">Skenario</th><th className="py-2 pr-2">Dokumen</th><th className="py-2 pr-2">Hasil</th><th className="py-2">Detail</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => (
-                <tr key={i} className="border-b border-zinc-200 align-top dark:border-zinc-800">
-                  <td className="py-2 pr-2">{r.skenario}</td>
-                  <td className="py-2 pr-2">{r.dokumen}</td>
-                  <td className={`py-2 pr-2 font-medium ${r.hasil === "LOLOS" ? "text-emerald-600" : "text-red-600"}`}>{r.hasil}</td>
-                  <td className="py-2 text-xs">{r.detail}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      )}
+          <button className="btn btn-seal mt-4" onClick={runBenchmark} disabled={!!busy}>
+            {busy === "benchmark" ? "⏱ Mengukur…" : "⏱ Jalankan Benchmark"}
+          </button>
+          {bmResult && (
+            <pre className="mono mt-4 max-h-48 overflow-auto rounded-md border border-[var(--line)] bg-white px-3 py-2 text-[11px] leading-4">{JSON.stringify(bmResult, null, 2)}</pre>
+          )}
+        </Panel>
+
+        <Panel title="B–D · Skenario serangan" desc="Satu PDF bertanda tangan dipakai untuk ketiga serangan. PDF dibuat di langkah Sign.">
+          <div className="space-y-4">
+            <FileField label="PDF bertanda tangan" accept="application/pdf" onChange={setSignedFile} fileName={signedFile?.name ?? null} hint="Belum ada PDF tertanda dipilih" />
+            <div className="flex flex-wrap gap-2">
+              <button className="btn btn-ghost" onClick={runTamper} disabled={!!busy}>{busy === "tamper" ? "…" : "✏ Uji tamper 1 karakter"}</button>
+              <button className="btn btn-ghost" onClick={runWrongKey} disabled={!!busy}>{busy === "wrongkey" ? "…" : "🗝 Uji kunci publik salah"}</button>
+              <button className="btn btn-ghost" onClick={runForgedQr} disabled={!!busy}>{busy === "forgedqr" ? "…" : "🖸 Uji QR dipalsukan"}</button>
+            </div>
+          </div>
+        </Panel>
+
+        {err && <Banner tone="err">{err}</Banner>}
+
+        {rows.length > 0 && (
+          <Panel
+            title="Tabel hasil pengujian"
+            desc="Semua skenario yang berjalan tercatat di sini — ekspor ke XLSX untuk lampiran laporan."
+            className="rise"
+          >
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <span className="mono text-xs text-[var(--ink-soft)]">{rows.length} skenario tercatat</span>
+              <button onClick={exportXlsx} className="btn btn-seal !px-3 !py-1.5 text-xs">⬇ Export XLSX</button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="text-left">
+                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2 pr-3">Skenario</th>
+                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2 pr-3">Dokumen</th>
+                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2 pr-3">Hasil</th>
+                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2">Detail</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r, i) => (
+                    <tr key={i} className="border-b border-[var(--line)] align-top last:border-0">
+                      <td className="py-2.5 pr-3 font-medium">{r.skenario}</td>
+                      <td className="mono py-2.5 pr-3 text-xs">{r.dokumen}</td>
+                      <td className="py-2.5 pr-3">
+                        <span className={`mono rounded-full border px-2 py-0.5 text-[11px] font-medium ${r.hasil === "LOLOS" ? "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]" : "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]"}`}>
+                          {r.hasil === "LOLOS" ? "✓ DITOLAK SISTEM" : "✗ LULUS (BAHAYA)"}
+                        </span>
+                      </td>
+                      <td className="mono py-2.5 text-[11px] leading-4 text-[var(--ink-soft)]">{r.detail}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+        )}
+      </div>
     </div>
   );
 }

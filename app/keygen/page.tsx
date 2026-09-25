@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-function download(name: string, content: string, type = "text/plain") {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([content], { type }));
-  a.download = name;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
+import { PageHead, Panel, TextField, Banner, CopyChip, download } from "@/components/ui";
 
 export default function KeygenPage() {
   const [pass, setPass] = useState("");
@@ -16,6 +9,8 @@ export default function KeygenPage() {
   const [result, setResult] = useState<{ publicKeyPem: string; fingerprint: string; encryptedPrivateKeyFile: string } | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const strength = pass.length >= 16 ? "kuat" : pass.length >= 8 ? "minimum terpenuhi" : "kurang dari 8 karakter";
 
   async function generate() {
     setError("");
@@ -38,35 +33,53 @@ export default function KeygenPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Generate KeyPair ECDSA P-256</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        Private key akan dienkripsi <b>AES-256-GCM</b> dengan key diturunkan dari passphrase Anda via
-        <b> scrypt</b>. Jangan lupa passphrase — tanpa itu key tidak bisa dipulihkan.
-      </p>
-      <div className="mt-6 space-y-3">
-        <input className="w-full rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900" type="password" placeholder="Passphrase (≥8 karakter)" value={pass} onChange={(e) => setPass(e.target.value)} />
-        <input className="w-full rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900" type="password" placeholder="Ulangi passphrase" value={pass2} onChange={(e) => setPass2(e.target.value)} />
-        <button onClick={generate} disabled={busy || pass.length < 8} className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900">
-          {busy ? "Memproses…" : "Generate KeyPair"}
-        </button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-      </div>
-      {result && (
-        <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-sm dark:border-emerald-800 dark:bg-emerald-950">
-          <p className="font-medium text-emerald-800 dark:text-emerald-300">KeyPair berhasil dibuat</p>
-          <p className="mt-1">Fingerprint: <code className="font-mono">{result.fingerprint}</code></p>
-          <pre className="mt-2 max-h-28 overflow-auto rounded bg-white p-2 font-mono text-xs dark:bg-zinc-900">{result.publicKeyPem}</pre>
-          <div className="mt-3 flex gap-2">
-            <button className="rounded border border-emerald-400 px-3 py-1.5 text-xs" onClick={() => download("public-key.pem", result.publicKeyPem)}>
-              ⬇ public-key.pem
+    <div>
+      <PageHead
+        step="Langkah 01 — Keygen"
+        title="Buat pasangan kunci ECDSA P-256"
+        sub="Private key langsung dienkripsi AES-256-GCM dengan key yang diturunkan dari passphrase via scrypt, lalu diunduh sebagai file .dsk. Public key (SPKI/PEM) bebas dibagikan ke siapa pun yang perlu memverifikasi tanda tangan Anda."
+      />
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <Panel title="Passphrase" desc="Passphrase tidak dikirim ke server dalam bentuk apa pun selain untuk menurunkan key AES — tidak disimpan di mana pun.">
+          <div className="space-y-4">
+            <TextField label="Passphrase (≥ 8 karakter)" type="password" value={pass} onChange={setPass} placeholder="••••••••" />
+            <div>
+              <TextField label="Ulangi passphrase" type="password" value={pass2} onChange={setPass2} placeholder="••••••••" />
+              {pass && (
+                <p className={`mono mt-1 text-[11px] ${pass.length >= 8 ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>
+                  {pass.length}/ karakter · {strength}
+                </p>
+              )}
+            </div>
+            <button className="btn btn-seal w-full justify-center" onClick={generate} disabled={busy || pass.length < 8 || pass !== pass2}>
+              {busy ? "Membangkitkan kunci…" : "Generate KeyPair"}
             </button>
-            <button className="rounded border border-emerald-400 px-3 py-1.5 text-xs" onClick={() => download("private-key.dsk", result.encryptedPrivateKeyFile)}>
-              ⬇ private-key.dsk (terenkripsi)
-            </button>
+            {pass !== pass2 && pass2 && <p className="text-sm text-[var(--err-ink)]">Konfirmasi belum cocok.</p>}
+            {error && <Banner tone="err">{error}</Banner>}
           </div>
-        </div>
-      )}
+        </Panel>
+        <Panel title="Hasil" desc="Simpan KEDUA file ini bersama-sama — .dsk tidak ada gunanya tanpa passphrase Anda.">
+          {result ? (
+            <div className="space-y-4">
+              <div className="rounded-lg border border-[var(--ok-line)] bg-[var(--ok-bg)] p-3 text-sm text-[var(--ok-ink)]">
+                ✓ KeyPair berhasil dibuat
+                <p className="mono mt-1 text-[11px]">fingerprint: {result.fingerprint}</p>
+              </div>
+              <div>
+                <span className="lbl">public-key.pem (boleh dibagikan)</span>
+                <pre className="mono max-h-28 overflow-auto rounded-md border border-[var(--line)] bg-white px-3 py-2 text-[11px] leading-4">{result.publicKeyPem}</pre>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => download("public-key.pem", result.publicKeyPem)}>⬇ public-key.pem</button>
+                <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => download("private-key.dsk", result.encryptedPrivateKeyFile)}>⬇ private-key.dsk</button>
+                <CopyChip text={result.publicKeyPem} label="salin PEM" />
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm italic text-[var(--ink-soft)]">Hasil generate akan muncul di sini — lengkap dengan tombol unduh public key dan private key terenkripsi.</p>
+          )}
+        </Panel>
+      </div>
     </div>
   );
 }
