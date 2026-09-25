@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 type SignerStatus = { name: string; role: string; institution: string; timestamp: string; valid: boolean; reason?: string };
 
@@ -15,8 +16,7 @@ export default function MultiSignPage() {
   const [busy, setBusy] = useState(false);
   const [sigCount, setSigCount] = useState(0);
 
-  const inputCls = "w-full rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
-  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setFields({ ...fields, [k]: e.target.value });
+  const set = (k: keyof typeof fields) => (v: string) => setFields({ ...fields, [k]: v });
 
   async function refreshStatus(id: string, fallbackBlob?: Blob) {
     const r = await fetch(`/api/multi-sign/status?docId=${encodeURIComponent(id)}`);
@@ -79,59 +79,66 @@ export default function MultiSignPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Multi-Penandatangan (Chained)</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        TASK.md §3.4 Opsi A: setiap signer menandatangani SHA-256(<i>dokumen asli</i> + seluruh signature
-        sebelumnya). Urutan tanda tangan terkunci — signer ke-2 tidak bisa disisipkan sebelum signer ke-1,
-        dan membuang/me reorder tanda tangan membuat verifikasi gagal.
-      </p>
-      <div className="mt-6 space-y-3">
-        {!docBlob ? (
-          <label className="block text-sm">
-            <span className="mb-1 block text-zinc-600 dark:text-zinc-400">Dokumen PDF awal</span>
-            <input type="file" accept="application/pdf" className={inputCls} onChange={(e) => setDoc(e.target.files?.[0] ?? null)} />
-          </label>
-        ) : (
-          <p className="rounded bg-zinc-100 p-2 text-sm dark:bg-zinc-900">
-            Dokumen aktif: <b>{docBlob.label}</b> ({sigCount} tanda tangan) —{" "}
-            <button className="underline" onClick={downloadCurrent}>unduh</button>
-            {" · "}
-            <button className="underline" onClick={() => { setDocBlob(null); setSigCount(0); setSigners([]); }}>ganti dokumen</button>
-          </p>
-        )}
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-600 dark:text-zinc-400">Private key terenkripsi signer ini (.dsk)</span>
-          <input type="file" className={inputCls} onChange={(e) => setKeyFile(e.target.files?.[0] ?? null)} />
-        </label>
-        <input className={inputCls} type="password" placeholder="Passphrase" value={fields.passphrase} onChange={set("passphrase")} />
-        <div className="grid gap-3 sm:grid-cols-3">
-          <input className={inputCls} placeholder="Nama signer" value={fields.signerName} onChange={set("signerName")} />
-          <input className={inputCls} placeholder="Jabatan" value={fields.signerRole} onChange={set("signerRole")} />
-          <input className={inputCls} placeholder="Institusi" value={fields.institution} onChange={set("institution")} />
-        </div>
-        <button onClick={addSigner} disabled={busy} className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900">
-          {busy ? "Menambahkan tanda tangan…" : "Tambah Tanda Tangan (Signer Berikutnya)"}
-        </button>
-        {docId && signers.length > 0 && (
-          <button className="ml-2 rounded border border-zinc-400 px-3 py-2 text-sm" onClick={() => refreshStatus(docId)}>
-            ↻ Cek status via /api/multi-sign/status
-          </button>
-        )}
-        {msg && (
-          <p className={`rounded p-3 text-sm ${msg.ok ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"}`}>{msg.text}</p>
-        )}
-        {signers.length > 0 && (
-          <ul className="space-y-2">
-            {signers.map((s, i) => (
-              <li key={i} className={`rounded border p-3 text-sm ${s.valid ? "border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950" : "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950"}`}>
-                <span className={s.valid ? "text-emerald-700" : "text-red-600"}>{s.valid ? `✓ Signer ${i + 1}: ${s.name} valid` : `✗ Signer ${i + 1}: ${s.name} GAGAL`}</span>
-                <span className="block text-xs text-zinc-500">{s.role} · {s.institution} · {s.timestamp ? new Date(s.timestamp).toLocaleString("id-ID") : ""}</span>
-                {s.reason && <span className="block text-xs text-red-600">{s.reason}</span>}
-              </li>
-            ))}
-          </ul>
-        )}
+    <div>
+      <PageHead
+        step="Langkah 04 — Multi-sign"
+        title="Beberapa signer, satu rantai tanda tangan"
+        sub="Setiap signer menandatangani SHA-256(dokumen asli ‖ seluruh signature sebelumnya). Urutan tanda tangan terkunci — signer ke-2 tidak bisa disisipkan sebelum signer ke-1, dan membuang/mengubah urutan membuat verifikasi gagal."
+      />
+      <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <Panel title="Signer berikutnya" desc="Siapkan dokumen dan kunci signer yang sedang mengantri. Setelah satu orang menandatangani, dokumen aktif otomatis berlanjut ke signer berikutnya.">
+          <div className="space-y-4">
+            {!docBlob ? (
+              <FileField label="Dokumen PDF awal" accept="application/pdf" onChange={setDoc} fileName={doc?.name ?? null} hint="Belum ada PDF dipilih" />
+            ) : (
+              <div className="rounded-lg border border-dashed border-[var(--line-strong)] bg-white/60 p-3 text-sm">
+                <span className="lbl">Dokumen aktif</span>
+                <p className="mono mt-1 truncate text-xs">{docBlob.label} · {sigCount} tanda tangan</p>
+                <div className="mt-2 flex gap-2">
+                  <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={downloadCurrent}>⬇ unduh</button>
+                  <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => { setDocBlob(null); setSigCount(0); setSigners([]); }}>↺ ganti dokumen</button>
+                </div>
+              </div>
+            )}
+            <FileField label="Private key signer ini (.dsk)" onChange={setKeyFile} fileName={keyFile?.name ?? null} hint="Belum ada .dsk dipilih" />
+            <TextField label="Passphrase" type="password" value={fields.passphrase} onChange={set("passphrase")} placeholder="••••••••" />
+            <TextField label="Nama signer" value={fields.signerName} onChange={set("signerName")} placeholder="mis. Dra. Ratna Wijaya" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField label="Jabatan" value={fields.signerRole} onChange={set("signerRole")} placeholder="Wakil Rektor" />
+              <TextField label="Institusi" value={fields.institution} onChange={set("institution")} placeholder="Universitas Siliwangi" />
+            </div>
+            <button className="btn btn-seal w-full justify-center" onClick={addSigner} disabled={busy}>
+              {busy ? "Menambahkan tanda tangan…" : `⑂ Tanda Tangani (Signer ke-${sigCount + 1})`}
+            </button>
+            {docId && signers.length > 0 && (
+              <button className="btn btn-ghost w-full justify-center" onClick={() => refreshStatus(docId)}>
+                ↻ Cek status rantai via server
+              </button>
+            )}
+            {msg && <Banner tone={msg.ok ? "ok" : "err"}>{msg.text}</Banner>}
+          </div>
+        </Panel>
+        <Panel title="Rantai tanda tangan" desc="Urutan dari kiri-atas ke bawah adalah urutan sign yang sebenarnya — sama seperti urutan di chained digest.">
+          {signers.length === 0 ? (
+            <div className="flex flex-col items-center gap-2 py-10 text-center">
+              <span className="mono text-3xl text-[var(--line-strong)]">⛓</span>
+              <p className="max-w-[26ch] text-sm italic text-[var(--ink-soft)]">Belum ada tanda tangan. Rantai akan terbentuk di sini setelah signer pertama membubuhkan tanda tangannya.</p>
+            </div>
+          ) : (
+            <ol className="space-y-3">
+              {signers.map((s, i) => (
+                <li key={i} className={`relative rounded-lg border p-3 pl-10 text-sm ${s.valid ? "border-[var(--ok-line)] bg-[var(--ok-bg)]" : "border-[var(--err-line)] bg-[var(--err-bg)]"}`}>
+                  <span className={`mono absolute left-3 top-3 text-xs ${s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>{String(i + 1).padStart(2, "0")}</span>
+                  <b className={s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}>{s.valid ? "✓ " : "✗ "}{s.name}</b>
+                  <span className="mono block text-[11px] text-[var(--ink-soft)]">{s.role} · {s.institution}</span>
+                  <span className="mono mt-1 block text-[11px] text-[var(--ink-soft)]">{new Date(s.timestamp).toLocaleString("id-ID")}</span>
+                  {s.reason && <p className="mt-1 text-xs">{s.reason}</p>}
+                  {i < signers.length - 1 && <span aria-hidden className="mono absolute -bottom-[15px] left-4 z-10 text-[var(--line-strong)]">↓</span>}
+                </li>
+              ))}
+            </ol>
+          )}
+        </Panel>
       </div>
     </div>
   );

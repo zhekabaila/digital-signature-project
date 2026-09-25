@@ -1,46 +1,50 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import SiteNav from "@/components/site-nav";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+});
+const plex = IBM_Plex_Sans({ variable: "--font-plex", subsets: ["latin"], weight: ["400", "500", "600"] });
+const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
-  title: "Digital Signature — ECDSA P-256 + QR Verification",
+  title: "Studio Tanda Tangan Digital — ECDSA P-256 · QR · Multi-Signer",
   description:
     "Tugas Kriptografi Universitas Siliwangi: tanda tangan digital ECDSA P-256, verifikasi QR-Code, dan multi-signer chained.",
 };
 
-const NAV = [
-  { href: "/keygen", label: "1. Generate Key" },
-  { href: "/sign", label: "2. Sign" },
-  { href: "/verify", label: "3. Verify" },
-  { href: "/multi-sign", label: "4. Multi-Signer" },
-  { href: "/attack-lab", label: "5. Pengujian & Attack Lab" },
-];
-
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="id" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-        <header className="border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-          <div className="mx-auto max-w-5xl px-6 py-4 flex flex-wrap items-center gap-x-6 gap-y-2">
-            <Link href="/" className="font-semibold tracking-tight">
-              ✒️ Digital Signature Lab
+    <html lang="id" className={`${fraunces.variable} ${plex.variable} ${plexMono.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col">
+        <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--paper)]/92 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3">
+            <Link href="/" className="flex items-center gap-3">
+              <span className="stamp !border-[var(--seal)] !text-[var(--seal)] px-2.5 py-0.5 !text-sm !font-black !tracking-widest" aria-hidden>
+                ✒
+              </span>
+              <span>
+                <span className="block font-[family-name:var(--font-display)] text-lg font-bold leading-tight tracking-tight">
+                  Studio Tanda Tangan Digital
+                </span>
+                <span className="mono block text-[10px] uppercase tracking-[0.18em] text-[var(--ink-soft)]">
+                  ECDSA P-256 · SHA-256 · QR verification
+                </span>
+              </span>
             </Link>
-            <nav className="flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
-              {NAV.map((n) => (
-                <Link key={n.href} href={n.href} className="hover:text-zinc-900 dark:hover:text-zinc-100">
-                  {n.label}
-                </Link>
-              ))}
-            </nav>
+            <SiteNav />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">{children}</main>
-        <footer className="border-t border-zinc-200 dark:border-zinc-800 py-4 text-center text-xs text-zinc-500">
-          Keamanan Informasi · Universitas Siliwangi — ECDSA P-256 · SHA-256 · AES-256-GCM
+        <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+        <footer className="border-t border-dashed border-[var(--line-strong)] py-5 text-center">
+          <p className="mono text-[11px] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
+            Keamanan Informasi · Universitas Siliwangi — kunci privat selalu terenkripsi, tidak ada secret di kode
+          </p>
         </footer>
       </body>
     </html>

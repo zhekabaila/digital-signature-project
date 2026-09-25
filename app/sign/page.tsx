@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 export default function SignPage() {
   const [fields, setFields] = useState({ passphrase: "", signerName: "", signerRole: "", institution: "" });
@@ -9,8 +10,7 @@ export default function SignPage() {
   const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) => setFields({ ...fields, [k]: e.target.value });
-  const inputCls = "w-full rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
+  const set = (k: keyof typeof fields) => (v: string) => setFields({ ...fields, [k]: v });
 
   async function sign() {
     setStatus(null);
@@ -44,36 +44,33 @@ export default function SignPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Tandatangani Dokumen PDF</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        Alur (TASK.md §3.2): private key didekripsi dengan passphrase → SHA-256 konten dokumen →
-        signature ECDSA P-256 (mencakup identitas signer) → QR-Code metadata + signature ditempel
-        sebagai halaman baru.
-      </p>
-      <div className="mt-6 space-y-3">
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-600 dark:text-zinc-400">Dokumen PDF</span>
-          <input type="file" accept="application/pdf" className={inputCls} onChange={(e) => setPdf(e.target.files?.[0] ?? null)} />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-600 dark:text-zinc-400">Private key terenkripsi (.dsk)</span>
-          <input type="file" className={inputCls} onChange={(e) => setKeyFile(e.target.files?.[0] ?? null)} />
-        </label>
-        <input className={inputCls} type="password" placeholder="Passphrase private key" value={fields.passphrase} onChange={set("passphrase")} />
-        <input className={inputCls} placeholder="Nama lengkap signer" value={fields.signerName} onChange={set("signerName")} />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <input className={inputCls} placeholder="Jabatan (mis. Dekan)" value={fields.signerRole} onChange={set("signerRole")} />
-          <input className={inputCls} placeholder="Institusi" value={fields.institution} onChange={set("institution")} />
-        </div>
-        <button onClick={sign} disabled={busy} className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900">
-          {busy ? "Menandatangani…" : "Sign & Unduh PDF + QR"}
-        </button>
-        {status && (
-          <p className={`rounded p-3 text-sm ${status.ok ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-300"}`}>
-            {status.msg}
-          </p>
-        )}
+    <div>
+      <PageHead
+        step="Langkah 02 — Sign"
+        title="Bubuhkan tanda tangan ke dokumen PDF"
+        sub="Private key didekripsi dengan passphrase → konten dokumen di-hash dengan SHA-256 → signature ECDSA P-256 dibuat atas hash + identitas signer → QR-Code metadata ditempel sebagai halaman baru. Hash dihitung sebelum QR ditempel, agar verifikasi tidak salah tuduh."
+      />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Panel title="Berkas" desc="Dua file ini berpasangan: .dsk hasil keygen + PDF yang akan ditandatangani.">
+          <div className="space-y-4">
+            <FileField label="Dokumen PDF" accept="application/pdf" onChange={setPdf} fileName={pdf?.name ?? null} hint="Belum ada PDF dipilih" />
+            <FileField label="Private key terenkripsi (.dsk)" onChange={setKeyFile} fileName={keyFile?.name ?? null} hint="Belum ada .dsk dipilih" />
+            <TextField label="Passphrase private key" type="password" value={fields.passphrase} onChange={set("passphrase")} placeholder="••••••••" />
+          </div>
+        </Panel>
+        <Panel title="Identitas signer" desc="Tercetak di halaman QR dan ikut tersign — mengubahnya setelah sign akan membatalkan signature.">
+          <div className="space-y-4">
+            <TextField label="Nama lengkap" value={fields.signerName} onChange={set("signerName")} placeholder="mis. Dr. Andi Pratama" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField label="Jabatan" value={fields.signerRole} onChange={set("signerRole")} placeholder="Dekan" />
+              <TextField label="Institusi" value={fields.institution} onChange={set("institution")} placeholder="Universitas Siliwangi" />
+            </div>
+            <button className="btn btn-seal w-full justify-center" onClick={sign} disabled={busy}>
+              {busy ? "Menandatangani…" : "⑂ Sign & Unduh PDF + QR"}
+            </button>
+            {status && <Banner tone={status.ok ? "ok" : "err"}>{status.msg}</Banner>}
+          </div>
+        </Panel>
       </div>
     </div>
   );

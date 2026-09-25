@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { PageHead, Panel, FileField, Stamp } from "@/components/ui";
 
 type VerifyResp = {
   valid: boolean;
@@ -19,8 +20,6 @@ export default function VerifyPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const streamRef = useRef<MediaStream | null>(null);
-
-  const inputCls = "w-full rounded border border-zinc-300 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900";
 
   async function verifyUpload() {
     setBusy(true); setResult(null);
@@ -71,55 +70,59 @@ export default function VerifyPage() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <h1 className="text-2xl font-semibold">Verifikasi Tanda Tangan</h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        Dua lapis penolakan (TASK.md §3.3): hash dokumen tidak cocok → &ldquo;dokumen diubah&rdquo;; signature tidak
-        cocok dengan public key → &ldquo;kunci tidak cocok&rdquo;. Opsional: unggah public key tertentu untuk menguji
-        verifikasi dengan kunci yang salah.
-      </p>
-
-      <div className="mt-6 space-y-3">
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-600 dark:text-zinc-400">PDF bertanda tangan</span>
-          <input type="file" accept="application/pdf" className={inputCls} onChange={(e) => setPdf(e.target.files?.[0] ?? null)} />
-        </label>
-        <label className="block text-sm">
-          <span className="mb-1 block text-zinc-600 dark:text-zinc-400">Public key (opsional — untuk uji kunci tidak cocok)</span>
-          <input type="file" className={inputCls} onChange={(e) => setKeyPem(e.target.files?.[0] ?? null)} />
-        </label>
-        <div className="flex gap-2">
-          <button onClick={verifyUpload} disabled={busy || !pdf} className="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900">
-            {busy ? "Memverifikasi…" : "Verifikasi PDF"}
-          </button>
-          {!scanning ? (
-            <button onClick={startScan} className="rounded border border-zinc-400 px-4 py-2 text-sm">📷 Scan QR dari kamera</button>
-          ) : (
-            <button onClick={stopScan} className="rounded border border-red-400 px-4 py-2 text-sm text-red-600">Hentikan scan</button>
-          )}
-        </div>
-        {scanning && (
-          <div className="relative overflow-hidden rounded-lg">
-            <video ref={videoRef} className="w-full" playsInline muted />
-            <canvas ref={canvasRef} className="hidden" />
-            <p className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">Arahkan kamera ke QR pada halaman tanda tangan…</p>
+    <div>
+      <PageHead
+        step="Langkah 03 — Verify"
+        title="Periksa keaslian dokumen"
+        sub="Verifikasi dua lapis: jika hash dokumen tidak cocok → “dokumen diubah”; jika signature tidak cocok dengan public key → “kunci tidak cocok”. Unggah public key pihak lain secara opsional untuk menguji penolakan kunci salah."
+      />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Panel title="Unggah PDF tertanda" desc="Sertakan file public key signer untuk memaksa verifikasi terhadap kunci tertentu.">
+          <div className="space-y-4">
+            <FileField label="PDF bertanda tangan" accept="application/pdf" onChange={setPdf} fileName={pdf?.name ?? null} hint="Belum ada PDF dipilih" />
+            <FileField label="Public key (opsional)" onChange={setKeyPem} fileName={keyPem?.name ?? null} hint="Untuk uji kunci tidak cocok — biarkan kosong untuk verifikasi normal" />
+            <button className="btn btn-seal w-full justify-center" onClick={verifyUpload} disabled={busy || !pdf}>
+              {busy ? "Memverifikasi…" : "⚖ Verifikasi PDF"}
+            </button>
           </div>
-        )}
+        </Panel>
+        <Panel title="Scan QR dari kamera" desc="Arahkan kamera ke QR-Code pada halaman tanda tangan. Scan hanya mengesahkan payload QR — tetap unggah PDF aslinya untuk memastikan isi dokumen utuh.">
+          {scanning ? (
+            <div className="space-y-3">
+              <div className="relative overflow-hidden rounded-lg border border-[var(--line-strong)]">
+                <video ref={videoRef} className="w-full" playsInline muted />
+                <canvas ref={canvasRef} className="hidden" />
+                <p className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">Arahkan kamera ke QR pada halaman tanda tangan…</p>
+              </div>
+              <button className="btn btn-ghost w-full justify-center !border-[var(--err-line)] !text-[var(--err-ink)]" onClick={stopScan}>■ Hentikan scan</button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 py-6 text-center">
+              <span className="stamp !rotate-0" style={{ color: "var(--ink-soft)" }}>📷</span>
+              <p className="text-sm text-[var(--ink-soft)]">Kamera mati. Tekan tombol di bawah untuk mulai memindai QR-Code pada dokumen tercetak/layar lain.</p>
+              <button className="btn btn-ghost" onClick={startScan}>▶ Mulai scan QR</button>
+            </div>
+          )}
+        </Panel>
       </div>
 
       {result && (
-        <div className={`mt-6 rounded-lg border p-4 text-sm ${result.valid ? "border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950" : "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950"}`}>
-          <p className={`font-semibold ${result.valid ? "text-emerald-800 dark:text-emerald-300" : "text-red-700 dark:text-red-300"}`}>
-            {result.error ? `Kesalahan: ${result.error}` : result.valid ? "✔ TANDA TANGAN VALID" : "✗ VERIFIKASI GAGAL"}
-          </p>
-          {result.reason && <p className="mt-1">{result.reason}</p>}
+        <div className={`panel rise mt-6 p-5 ${result.valid ? "border-[var(--ok-line)] bg-[var(--ok-bg)]" : "border-[var(--err-line)] bg-[var(--err-bg)]"}`}>
+          <div className="flex items-start justify-between gap-4">
+            <p className={`font-[family-name:var(--font-display)] text-xl font-bold ${result.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>
+              {result.error ? `Kesalahan: ${result.error}` : result.valid ? "Tanda tangan valid" : "Verifikasi gagal"}
+            </p>
+            <Stamp valid={result.valid} label={result.valid ? "SAH" : "DITOLAK"} />
+          </div>
+          {result.reason && <p className={`mt-2 text-sm ${result.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>{result.reason}</p>}
           {result.signers?.length ? (
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-4 space-y-2">
               {result.signers.map((s, i) => (
-                <li key={i} className="rounded bg-white/70 p-2 dark:bg-zinc-900/60">
-                  <span className={s.valid ? "text-emerald-700 dark:text-emerald-400" : "text-red-600"}>{s.valid ? "✓" : "✗"}</span>{" "}
-                  <b>{s.signer.signerName}</b> — {s.signer.signerRole}, {s.signer.institution}
-                  <span className="block text-xs text-zinc-500">
+                <li key={i} className="rounded-lg border border-[var(--line)] bg-white/70 p-3">
+                  <span className={s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}>{s.valid ? "✓" : "✗"}</span>{" "}
+                  <b>{s.signer.signerName}</b>
+                  <span className="mono text-xs text-[var(--ink-soft)]"> — {s.signer.signerRole}, {s.signer.institution}</span>
+                  <span className="mt-1 block text-xs text-[var(--ink-soft)]">
                     {new Date(s.signer.timestamp).toLocaleString("id-ID")} · {s.reason ?? "signature & hash cocok dengan kunci publik signer"}
                   </span>
                 </li>
@@ -127,7 +130,7 @@ export default function VerifyPage() {
             </ul>
           ) : null}
           {result.valid && result.signers?.length === 1 && (
-            <p className="mt-2 text-xs text-zinc-500">
+            <p className="mt-3 text-xs text-[var(--ink-soft)]">
               Catatan: verifikasi dari scan QR mengesahkan signature terhadap kunci publik; cocokkan juga
               file PDF aslinya lewat unggah PDF di atas untuk memastikan isi dokumen belum diubah.
             </p>
