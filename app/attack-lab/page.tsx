@@ -194,19 +194,19 @@ export default function AttackLabPage() {
               <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr className="text-left">
-                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2 pr-3">Skenario</th>
-                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2 pr-3">Dokumen</th>
-                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2 pr-3">Hasil</th>
-                    <th className="lbl !text-[10px] border-b-2 border-[var(--line-strong)] py-2">Detail</th>
+                    <th className="mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-soft)] border-b-2 border-[var(--line-strong)] py-2 pr-3">Skenario</th>
+                    <th className="mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-soft)] border-b-2 border-[var(--line-strong)] py-2 pr-3">Dokumen</th>
+                    <th className="mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-soft)] border-b-2 border-[var(--line-strong)] py-2 pr-3">Hasil</th>
+                    <th className="mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-soft)] border-b-2 border-[var(--line-strong)] py-2">Detail</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r, i) => (
                     <tr key={i} className="border-b border-[var(--line)] align-top last:border-0">
-                      <td className="py-2.5 pr-3 font-medium">{r.skenario}</td>
-                      <td className="mono py-2.5 pr-3 text-xs">{r.dokumen}</td>
+                      <td className="py-2.5 pr-3 font-medium whitespace-nowrap">{r.skenario}</td>
+                      <td className="mono py-2.5 pr-3 text-xs whitespace-nowrap">{r.dokumen}</td>
                       <td className="py-2.5 pr-3">
-                        <span className={`mono rounded-full border px-2 py-0.5 text-[11px] font-medium ${r.hasil === "LOLOS" ? "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]" : "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]"}`}>
+                        <span className={`mono rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${r.hasil === "LOLOS" ? "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]" : "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]"}`}>
                           {r.hasil === "LOLOS" ? "✓ DITOLAK SISTEM" : "✗ LULUS (BAHAYA)"}
                         </span>
                       </td>
