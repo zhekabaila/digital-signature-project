@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Download, RotateCcw, Stamp, RefreshCw, Link2, ArrowDown, Check, X } from "lucide-react";
 import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 type SignerStatus = { name: string; role: string; institution: string; timestamp: string; valid: boolean; reason?: string };
@@ -95,8 +96,12 @@ export default function MultiSignPage() {
                 <span className="lbl">Dokumen aktif</span>
                 <p className="mono mt-1 truncate text-xs">{docBlob.label} · {sigCount} tanda tangan</p>
                 <div className="mt-2 flex gap-2">
-                  <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={downloadCurrent}>⬇ unduh</button>
-                  <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => { setDocBlob(null); setSigCount(0); setSigners([]); }}>↺ ganti dokumen</button>
+                  <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={downloadCurrent}>
+                    <Download size={13} aria-hidden /> unduh
+                  </button>
+                  <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => { setDocBlob(null); setSigCount(0); setSigners([]); }}>
+                    <RotateCcw size={13} aria-hidden /> ganti dokumen
+                  </button>
                 </div>
               </div>
             )}
@@ -108,11 +113,11 @@ export default function MultiSignPage() {
               <TextField label="Institusi" value={fields.institution} onChange={set("institution")} placeholder="Universitas Siliwangi" />
             </div>
             <button className="btn btn-seal w-full justify-center" onClick={addSigner} disabled={busy}>
-              {busy ? "Menambahkan tanda tangan…" : `⑂ Tanda Tangani (Signer ke-${sigCount + 1})`}
+              {busy ? "Menambahkan tanda tangan…" : (<><Stamp size={15} aria-hidden /> Tanda Tangani (Signer ke-{sigCount + 1})</>)}
             </button>
             {docId && signers.length > 0 && (
               <button className="btn btn-ghost w-full justify-center" onClick={() => refreshStatus(docId)}>
-                ↻ Cek status rantai via server
+                <RefreshCw size={13} aria-hidden /> Cek status rantai via server
               </button>
             )}
             {msg && <Banner tone={msg.ok ? "ok" : "err"}>{msg.text}</Banner>}
@@ -121,7 +126,9 @@ export default function MultiSignPage() {
         <Panel title="Rantai tanda tangan" desc="Urutan dari kiri-atas ke bawah adalah urutan sign yang sebenarnya — sama seperti urutan di chained digest.">
           {signers.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-10 text-center">
-              <span className="mono text-3xl text-[var(--line-strong)]">⛓</span>
+              <span className="text-[var(--line-strong)]" aria-hidden>
+                <Link2 size={30} />
+              </span>
               <p className="max-w-[26ch] text-sm italic text-[var(--ink-soft)]">Belum ada tanda tangan. Rantai akan terbentuk di sini setelah signer pertama membubuhkan tanda tangannya.</p>
             </div>
           ) : (
@@ -129,11 +136,14 @@ export default function MultiSignPage() {
               {signers.map((s, i) => (
                 <li key={i} className={`relative rounded-lg border p-3 pl-10 text-sm ${s.valid ? "border-[var(--ok-line)] bg-[var(--ok-bg)]" : "border-[var(--err-line)] bg-[var(--err-bg)]"}`}>
                   <span className={`mono absolute left-3 top-3 text-xs ${s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>{String(i + 1).padStart(2, "0")}</span>
-                  <b className={s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}>{s.valid ? "✓ " : "✗ "}{s.name}</b>
+                  <b className={`inline-flex items-center gap-1 ${s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>
+                    {s.valid ? <Check size={13} strokeWidth={3} aria-hidden /> : <X size={13} strokeWidth={3} aria-hidden />}
+                    {s.name}
+                  </b>
                   <span className="mono block text-[11px] text-[var(--ink-soft)]">{s.role} · {s.institution}</span>
                   <span className="mono mt-1 block text-[11px] text-[var(--ink-soft)]">{new Date(s.timestamp).toLocaleString("id-ID")}</span>
                   {s.reason && <p className="mt-1 text-xs">{s.reason}</p>}
-                  {i < signers.length - 1 && <span aria-hidden className="mono absolute -bottom-[15px] left-4 z-10 text-[var(--line-strong)]">↓</span>}
+                  {i < signers.length - 1 && <span aria-hidden className="absolute -bottom-[17px] left-[13px] z-10 text-[var(--line-strong)]"><ArrowDown size={15} /></span>}
                 </li>
               ))}
             </ol>

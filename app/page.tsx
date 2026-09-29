@@ -1,30 +1,31 @@
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const MODES = [
   {
     href: "/keygen", num: "01", title: "Keygen",
     desc: "Pasangan kunci ECDSA P-256. Private key terenkripsi AES-256-GCM (scrypt) — tidak pernah ada sebagai plaintext.",
-    meta: "passphrase → .dsk + public-key.pem",
+    meta: ["passphrase", ".dsk + public-key.pem"],
   },
   {
     href: "/sign", num: "02", title: "Sign",
     desc: "Unggah PDF + kunci terenkripsi + passphrase. Hash SHA-256 konten ditandatangani, QR-Code metadata menempel sebagai halaman tanda tangan.",
-    meta: "PDF → SHA-256 → ECDSA → QR",
+    meta: ["PDF", "SHA-256", "ECDSA", "QR"],
   },
   {
     href: "/verify", num: "03", title: "Verify",
     desc: "Unggah PDF atau scan QR langsung dari kamera. Menolak dokumen yang diubah DAN kunci yang tidak cocok — dua lapis pemeriksaan terpisah.",
-    meta: "hash match + signature match",
+    meta: ["hash match + signature match"],
   },
   {
     href: "/multi-sign", num: "04", title: "Multi-Signer",
     desc: "Chained integrity: tanda tangan signer berikutnya mengunci seluruh signature sebelumnya. Urutan tidak bisa diubah atau dilewati.",
-    meta: "SHA256(doc ‖ sig₁ ‖ … ‖ sigᵢ₋₁)",
+    meta: ["SHA256(doc ‖ sig₁ ‖ … ‖ sigᵢ₋₁)"],
   },
   {
     href: "/attack-lab", num: "05", title: "Attack Lab",
     desc: "Benchmark ≥30 percobaan, uji tamper satu karakter, uji kunci salah, uji QR dipalsukan. Tabel hasil siap diekspor ke XLSX.",
-    meta: "timing · tamper · wrong-key · forged-QR",
+    meta: ["timing · tamper · wrong-key · forged-QR"],
   },
 ];
 
@@ -55,11 +56,20 @@ export default function Home() {
             <span className="min-w-0 flex-1">
               <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
                 <span className="font-[family-name:var(--font-display)] text-xl font-bold tracking-tight">{m.title}</span>
-                <span className="mono text-[11px] uppercase tracking-[0.14em] text-[var(--seal)]">{m.meta}</span>
+                <span className="mono flex flex-wrap items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] text-[var(--seal)]">
+                  {m.meta.map((part, j) => (
+                    <span key={j} className="flex items-center gap-1.5">
+                      {j > 0 && <ArrowRight size={11} aria-hidden />}
+                      {part}
+                    </span>
+                  ))}
+                </span>
               </span>
               <span className="mt-1.5 block text-sm leading-relaxed text-[var(--ink-soft)]">{m.desc}</span>
             </span>
-            <span className="mono self-center text-lg text-[var(--line-strong)]" aria-hidden>→</span>
+            <span className="self-center text-[var(--line-strong)]" aria-hidden>
+              <ArrowRight size={18} />
+            </span>
           </Link>
         ))}
       </div>

@@ -2,7 +2,7 @@ import { exportEncryptedKeyBundle } from "@/lib/crypto/keypair";
 
 export const runtime = "nodejs";
 
-/** TASK.md §4: passphrase → keypair ECDSA P-256, private key terenkripsi (bundle). */
+/** passphrase → keypair ECDSA P-256, private key terenkripsi (bundle). */
 export async function POST(request: Request) {
   const { passphrase } = (await request.json()) as { passphrase?: string };
   if (!passphrase || passphrase.length < 8) {

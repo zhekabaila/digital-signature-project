@@ -6,9 +6,9 @@ Proyek Tugas Kriptografi (Topik D) · Mata kuliah Keamanan Informasi · Universi
 
 | Nama | NPM | Peran |
 |---|---|---|
-| _(isi nama anggota 1)_ | _(NPM)_ | A — Core Crypto & Key Management |
-| _(isi nama anggota 2)_ | _(NPM)_ | B — PDF & QR-Code |
-| _(isi nama anggota 3)_ | _(NPM)_ | C — UI, Multi-Signer Flow, Pengujian |
+| _(Shafa Rabbani Fityatul Mukarramah)_ | _(247006111020)_ | User Interface |
+| _(Raden Anissa)_ | _(247006111021)_ | Pengujian |
+| _(Zheka Baila Arkan)_ | _(247006111152)_ | Logic |
 
 > Ganti tabel ini dengan data anggota kelompok sebelum submit.
 
@@ -22,7 +22,7 @@ Proyek Tugas Kriptografi (Topik D) · Mata kuliah Keamanan Informasi · Universi
   halaman baru, plus salinan payload di metadata PDF (catalog key `/DSig`).
 - **Verifikasi dua lapis** (menolak dokumen yang diubah **dan** kunci yang tidak cocok):
   unggah PDF **atau** scan QR langsung dari kamera browser (jsQR).
-- **Multi-penandatangan chained** (§3.4 Opsi A): `hash signer-i = SHA256(dokumen_asli ‖ sig_1 ‖ … ‖ sig_{i-1})`
+- **Multi-penandatangan chained** (desain Opsi A): `hash signer-i = SHA256(dokumen_asli ‖ sig_1 ‖ … ‖ sig_{i-1})`
   → urutan tanda tangan tidak bisa diubah/dilewati.
 - **Attack lab & pengujian wajib**: benchmark ≥30 percobaan sign/verify, ukuran
   signature/public key, uji tamper, uji kunci salah, uji QR dipalsukan — tabel hasil +
@@ -33,20 +33,10 @@ Proyek Tugas Kriptografi (Topik D) · Mata kuliah Keamanan Informasi · Universi
 ```bash
 npm install
 npm run dev            # http://localhost:3000
-npx vitest run         # 37 unit test (test/*.test.ts)
-npx tsx scripts/generate-data-uji.mts   # buat 5 PDF sampel (sudah dibuatkan, di data-uji/)
-npx tsx scripts/run-tests.mts           # jalankan seluruh pengujian §3.5 → hasil-uji/
+npx vitest run
+npx tsx scripts/generate-data-uji.mts
+npx tsx scripts/run-tests.mts
 ```
-
-## Alur Demo UTS (§7)
-
-1. `/keygen` → generate key (pasangan 1), unduh `public-key.pem` + `private-key.dsk`.
-2. `/sign` → unggah PDF dari `data-uji/` + `.dsk` + passphrase → unduh PDF bertanda tangan (QR di halaman terakhir).
-3. `/verify` → scan QR dengan kamera ATAU unggah PDF → **VALID** (nama, jabatan, waktu muncul).
-4. Buka PDF bertanda tangan di editor teks apa pun, ubah 1 karakter, simpan → `/verify` → **GAGAL**: "Dokumen telah diubah…".
-5. `/verify` → unggah PDF bertanda + `public-key.pem` milik key lain → **GAGAL**: "Tanda tangan tidak cocok dengan kunci publik…".
-6. `/multi-sign` → tambahkan signer kedua pada dokumen yang sama → status per-signer ✓.
-7. `/attack-lab` → jalankan benchmark + 3 skenario serangan → Export XLSX.
 
 ## Arsitektur
 
@@ -63,7 +53,7 @@ data-uji/       5 PDF sampel · hasil-uji/ tabel timing + attack (json/md/xlsx)
 
 ### Desain penting
 
-- **Apa yang di-hash (TASK.md §8)**: `documentHash` dihitung dari **byte kanonik konten PDF
+- **Apa yang di-hash**: `documentHash` dihitung dari **byte kanonik konten PDF
   sebelum QR ditempel**. Kanonisasi = muat PDF → buang metadata `/DSig` → buang halaman tanda
   tangan → salin halaman asli ke dokumen baru tanpa timestamp (`updateMetadata:false`) → save.
   Deterministik (dibuktikan test) dan berubah jika 1 karakter teks dokumen diubah.
@@ -74,7 +64,7 @@ data-uji/       5 PDF sampel · hasil-uji/ tabel timing + attack (json/md/xlsx)
 - **`/api/multi-sign/status?docId=`** memakai store in-memory (dokumen tidak pernah ditulis ke
   disk); docId dikembalikan lewat header `X-Document-Id`. Sengaja non-persisten — sesuai
   ketentuan "tidak ada key/dokumen disimpan server".
-- Endpoint `/api/export-xlsx` ditambahkan di luar daftar §2 karena §3.5 mewajibkan ekspor XLSX.
+- Endpoint `/api/export-xlsx` ditambahkan di luar struktur folder awal karena hasil pengujian wajib dapat diekspor.
 
 ## Keamanan
 
@@ -83,10 +73,3 @@ data-uji/       5 PDF sampel · hasil-uji/ tabel timing + attack (json/md/xlsx)
   di-zero (`fill(0)`) segera setelah dipakai.
 - Hash dokumen wajib SHA-256 (tidak ada MD5/SHA-1).
 - `.gitignore` sudah mencakup `.env*` dan `*.pem`.
-
-## Pemetaan Rubrik
-
-Lihat checklist §5 `TASK.md` — seluruh baris dipenuhi: keygen ECDSA P-256, sign hash SHA-256,
-verifikasi dua lapis penolakan, QR metadata (nama/jabatan/tanggal/institusi/signature/fingerprint),
-private key terenkripsi, timing ≥30 percobaan, ukuran signature & public key, uji tamper/kunci
-salah/QR palsu, multi-signer chained, ≥5 unit test, README ini.

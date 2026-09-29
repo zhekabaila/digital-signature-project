@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, X, Clipboard } from "lucide-react";
 
 export function PageHead({ step, title, sub }: { step: string; title: string; sub?: string }) {
   return (
@@ -52,7 +53,12 @@ export function FileField({
     <label className="block">
       <span className="lbl">{label}</span>
       <input type="file" accept={accept} className="field file:mr-3 cursor-pointer" onChange={(e) => onChange(e.target.files?.[0] ?? null)} />
-      {fileName && <span className="mono mt-1 block text-[11px] text-[var(--ok-ink)]">✓ {fileName}</span>}
+      {fileName && (
+        <span className="mono mt-1 flex items-center gap-1.5 text-[11px] text-[var(--ok-ink)]">
+          <Check size={12} strokeWidth={3} aria-hidden />
+          {fileName}
+        </span>
+      )}
       {hint && !fileName && <span className="mt-1 block text-[11px] text-[var(--ink-soft)]">{hint}</span>}
     </label>
   );
@@ -80,8 +86,8 @@ export function Banner({ tone, children }: { tone: "ok" | "err"; children: React
 
 export function Stamp({ valid, label }: { valid: boolean; label: string }) {
   return (
-    <span className="stamp" style={{ color: valid ? "var(--ok-ink)" : "var(--err-ink)" }}>
-      {valid ? "✓ " : "✗ "}
+    <span className="stamp inline-flex items-center gap-1.5" style={{ color: valid ? "var(--ok-ink)" : "var(--err-ink)" }}>
+      {valid ? <Check size={14} strokeWidth={3} aria-hidden /> : <X size={14} strokeWidth={3} aria-hidden />}
       {label}
     </span>
   );
@@ -102,7 +108,17 @@ export function CopyChip({ text, label }: { text: string; label: string }) {
         }
       }}
     >
-      {copied ? "✓ tersalin" : `⧉ ${label}`}
+      {copied ? (
+        <span className="flex items-center gap-1.5">
+          <Check size={12} strokeWidth={3} aria-hidden />
+          tersalin
+        </span>
+      ) : (
+        <span className="flex items-center gap-1.5">
+          <Clipboard size={12} aria-hidden />
+          {label}
+        </span>
+      )}
     </button>
   );
 }

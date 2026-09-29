@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Timer, PenLine, KeyRound, QrCode, Download, Check, X } from "lucide-react";
 import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 type Row = { skenario: string; dokumen: string; hasil: "LOLOS" | "DITOLAK"; detail: string };
@@ -55,7 +56,7 @@ export default function AttackLabPage() {
     } catch (e) { setErr((e as Error).message); } finally { setBusy(""); }
   }
 
-  /** §3.5 uji tamper — ubah satu karakter teks via pdf-lib di browser, lalu verifikasi. */
+  /** uji tamper — ubah satu karakter teks via pdf-lib di browser, lalu verifikasi. */
   async function runTamper() {
     setErr("");
     if (!signedFile) return setErr("Unggah PDF yang sudah ditandatangani");
@@ -72,12 +73,12 @@ export default function AttackLabPage() {
         skenario: "Tamper 1 karakter isi dokumen",
         dokumen: signedFile.name,
         hasil: after.valid === false ? "LOLOS" : "DITOLAK",
-        detail: `sebelum: ${base.valid ? "valid" : "tidak valid · " + (base.reason ?? base.signers?.[0]?.reason ?? "")} → sesudah tamper: ${after.valid ? "MASIH VALID (BAHAYA)" : "DITOLAK · " + (after.reason ?? after.signers?.[0]?.reason ?? "")}`,
+        detail: `sebelum: ${base.valid ? "valid" : "tidak valid · " + (base.reason ?? base.signers?.[0]?.reason ?? "")} — sesudah tamper: ${after.valid ? "MASIH VALID (BAHAYA)" : "DITOLAK · " + (after.reason ?? after.signers?.[0]?.reason ?? "")}`,
       });
     } catch (e) { setErr((e as Error).message); } finally { setBusy(""); }
   }
 
-  /** §3.5 uji kunci salah — verifikasi dengan public key pasangan lain. */
+  /** uji kunci salah — verifikasi dengan public key pasangan lain. */
   async function runWrongKey() {
     setErr("");
     if (!signedFile) return setErr("Unggah PDF yang sudah ditandatangani");
@@ -98,7 +99,7 @@ export default function AttackLabPage() {
     } catch (e) { setErr((e as Error).message); } finally { setBusy(""); }
   }
 
-  /** §3.5 uji QR dipalsukan — baca payload (sama dgn isi QR) dari metadata, ubah nama signer, verify. */
+  /** uji QR dipalsukan — baca payload (sama dgn isi QR) dari metadata, ubah nama signer, verify. */
   async function runForgedQr() {
     setErr("");
     if (!signedFile) return setErr("Unggah PDF yang sudah ditandatangani");
@@ -160,7 +161,7 @@ export default function AttackLabPage() {
             </label>
           </div>
           <button className="btn btn-seal mt-4" onClick={runBenchmark} disabled={!!busy}>
-            {busy === "benchmark" ? "⏱ Mengukur…" : "⏱ Jalankan Benchmark"}
+            {busy === "benchmark" ? (<><Timer size={15} aria-hidden /> Mengukur…</>) : (<><Timer size={15} aria-hidden /> Jalankan Benchmark</>)}
           </button>
           {bmResult && (
             <pre className="mono mt-4 max-h-48 overflow-auto rounded-md border border-[var(--line)] bg-white px-3 py-2 text-[11px] leading-4">{JSON.stringify(bmResult, null, 2)}</pre>
@@ -171,9 +172,9 @@ export default function AttackLabPage() {
           <div className="space-y-4">
             <FileField label="PDF bertanda tangan" accept="application/pdf" onChange={setSignedFile} fileName={signedFile?.name ?? null} hint="Belum ada PDF tertanda dipilih" />
             <div className="flex flex-wrap gap-2">
-              <button className="btn btn-ghost" onClick={runTamper} disabled={!!busy}>{busy === "tamper" ? "…" : "✏ Uji tamper 1 karakter"}</button>
-              <button className="btn btn-ghost" onClick={runWrongKey} disabled={!!busy}>{busy === "wrongkey" ? "…" : "🗝 Uji kunci publik salah"}</button>
-              <button className="btn btn-ghost" onClick={runForgedQr} disabled={!!busy}>{busy === "forgedqr" ? "…" : "🖸 Uji QR dipalsukan"}</button>
+              <button className="btn btn-ghost" onClick={runTamper} disabled={!!busy}>{busy === "tamper" ? "…" : (<><PenLine size={13} aria-hidden /> Uji tamper 1 karakter</>)}</button>
+              <button className="btn btn-ghost" onClick={runWrongKey} disabled={!!busy}>{busy === "wrongkey" ? "…" : (<><KeyRound size={13} aria-hidden /> Uji kunci publik salah</>)}</button>
+              <button className="btn btn-ghost" onClick={runForgedQr} disabled={!!busy}>{busy === "forgedqr" ? "…" : (<><QrCode size={13} aria-hidden /> Uji QR dipalsukan</>)}</button>
             </div>
           </div>
         </Panel>
@@ -188,7 +189,9 @@ export default function AttackLabPage() {
           >
             <div className="mb-4 flex items-center justify-between gap-3">
               <span className="mono text-xs text-[var(--ink-soft)]">{rows.length} skenario tercatat</span>
-              <button onClick={exportXlsx} className="btn btn-seal !px-3 !py-1.5 text-xs">⬇ Export XLSX</button>
+              <button onClick={exportXlsx} className="btn btn-seal !px-3 !py-1.5 text-xs">
+                <Download size={13} aria-hidden /> Export XLSX
+              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-sm">
@@ -206,8 +209,9 @@ export default function AttackLabPage() {
                       <td className="py-2.5 pr-3 font-medium whitespace-nowrap">{r.skenario}</td>
                       <td className="mono py-2.5 pr-3 text-xs whitespace-nowrap">{r.dokumen}</td>
                       <td className="py-2.5 pr-3">
-                        <span className={`mono rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${r.hasil === "LOLOS" ? "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]" : "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]"}`}>
-                          {r.hasil === "LOLOS" ? "✓ DITOLAK SISTEM" : "✗ LULUS (BAHAYA)"}
+                        <span className={`mono inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${r.hasil === "LOLOS" ? "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]" : "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]"}`}>
+                          {r.hasil === "LOLOS" ? <Check size={11} strokeWidth={3} aria-hidden /> : <X size={11} strokeWidth={3} aria-hidden />}
+                          {r.hasil === "LOLOS" ? "DITOLAK SISTEM" : "LULUS (BAHAYA)"}
                         </span>
                       </td>
                       <td className="mono py-2.5 text-[11px] leading-4 text-[var(--ink-soft)]">{r.detail}</td>

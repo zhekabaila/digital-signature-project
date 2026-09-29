@@ -47,7 +47,7 @@ export function decodeQRBitmap(bmp: QRBitmap): string | null {
   return res?.data ?? null;
 }
 
-/** Validasi bentuk payload QR — payload rusak/dipotong harus ditolak (test §3.5 kasus 3). */
+/** Validasi bentuk payload QR — payload rusak/dipotong harus ditolak sebelum proses kriptografi. */
 export function isSignerPayloadJson(text: string): boolean {
   try {
     const o = JSON.parse(text);

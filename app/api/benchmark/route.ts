@@ -6,7 +6,7 @@ import { createPublicKey } from "node:crypto";
 export const runtime = "nodejs";
 
 /**
- * TASK.md §3.5 — ≥30 percobaan sign() dan verify() pada satu dokumen,
+ * percobaan sign() dan verify() pada satu dokumen,
  * plus ukuran signature & public key. iterations default 30, maks 500.
  */
 export async function POST(request: Request) {

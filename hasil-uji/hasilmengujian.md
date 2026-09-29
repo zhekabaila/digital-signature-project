@@ -1,4 +1,4 @@
-# Hasil Pengujian Wajib (TASK.md §3.5)
+# Hasil Pengujian Wajib
 
 ECDSA P-256 · SHA-256 · Node.js v24.14.0 · 30 percobaan per dokumen · digenerate: 2026-09-23T00:53:19.189Z
 

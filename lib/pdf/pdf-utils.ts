@@ -33,8 +33,8 @@ export function removeSignInfo(doc: PDFDocument): void {
 }
 
 /**
- * Bentuk kanonik byte PDF yang di-hash (TASK.md §8: hash dihitung dari konten
- * SEBELUM QR ditempel). Strategi: buang metadata DSig + buang semua halaman
+ * Bentuk kanonik byte PDF yang di-hash — hash WAJIB dihitung dari konten
+ * SEBELUM QR ditempel. Strategi: buang metadata DSig + buang semua halaman
  * tanda tangan (indeks >= origPageCount), lalu salin halaman asli ke dokumen
  * segar supaya objek gambar/font sisa tidak ikut tersimpan.
  * Terbukti deterministik & berubah bila 1 karakter teks diubah (lihat test).

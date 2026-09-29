@@ -1,4 +1,4 @@
-/** Buat 5 PDF sampel di data-uji/ (TASK.md §2 & §3.5). Jalankan: npx tsx scripts/generate-data-uji.mts */
+/** Buat 5 PDF sampel di data-uji/. Jalankan: npx tsx scripts/generate-data-uji.mts */
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { mkdirSync, existsSync } from "node:fs";
 import path from "node:path";

@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
 
-/** TASK.md §3.2 — PDF + private key terenkripsi + passphrase → PDF bertanda tangan + QR. */
+/** PDF + private key terenkripsi + passphrase → PDF bertanda tangan + QR. */
 export async function POST(request: Request) {
   let ctx: Awaited<ReturnType<typeof parseSignForm>>;
   try {
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       ctx.publicKeyPem,
       ctx.meta,
     );
-    ctx.privateKeyDer.fill(0); // TASK.md §8 — buang plaintext segera
+    ctx.privateKeyDer.fill(0); // buang plaintext private key dari memori segera
     const docId = randomUUID();
     putDocument(docId, signedPdfBytes, "signed-document.pdf");
     return new Response(new Uint8Array(signedPdfBytes), {

@@ -6,7 +6,7 @@ export interface TimingSummary {
   samplesMs: number[];
 }
 
-/** Jalankan fn N kali, kumpulkan rata-rata/min/max (TASK.md §3.5: ≥30 percobaan). */
+/** Jalankan fn N kali, kumpulkan rata-rata/min/max (≥30 percobaan agar hasil andal). */
 export async function measure(fn: () => unknown | Promise<unknown>, iterations: number): Promise<TimingSummary> {
   const samples: number[] = [];
   for (let i = 0; i < iterations; i++) {

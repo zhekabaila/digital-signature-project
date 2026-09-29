@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Scale, Square, Camera, Play, Check, X } from "lucide-react";
 import { PageHead, Panel, FileField, Stamp } from "@/components/ui";
 
 type VerifyResp = {
@@ -74,7 +75,7 @@ export default function VerifyPage() {
       <PageHead
         step="Langkah 03 — Verify"
         title="Periksa keaslian dokumen"
-        sub="Verifikasi dua lapis: jika hash dokumen tidak cocok → “dokumen diubah”; jika signature tidak cocok dengan public key → “kunci tidak cocok”. Unggah public key pihak lain secara opsional untuk menguji penolakan kunci salah."
+        sub="Verifikasi dua lapis: hash dokumen tidak cocok berarti “dokumen diubah”; signature tidak cocok dengan public key berarti “kunci tidak cocok”. Unggah public key pihak lain secara opsional untuk menguji penolakan kunci salah."
       />
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel title="Unggah PDF tertanda" desc="Sertakan file public key signer untuk memaksa verifikasi terhadap kunci tertentu.">
@@ -82,7 +83,7 @@ export default function VerifyPage() {
             <FileField label="PDF bertanda tangan" accept="application/pdf" onChange={setPdf} fileName={pdf?.name ?? null} hint="Belum ada PDF dipilih" />
             <FileField label="Public key (opsional)" onChange={setKeyPem} fileName={keyPem?.name ?? null} hint="Untuk uji kunci tidak cocok — biarkan kosong untuk verifikasi normal" />
             <button className="btn btn-seal w-full justify-center" onClick={verifyUpload} disabled={busy || !pdf}>
-              {busy ? "Memverifikasi…" : "⚖ Verifikasi PDF"}
+              {busy ? "Memverifikasi…" : (<><Scale size={15} aria-hidden /> Verifikasi PDF</>)}
             </button>
           </div>
         </Panel>
@@ -94,13 +95,19 @@ export default function VerifyPage() {
                 <canvas ref={canvasRef} className="hidden" />
                 <p className="absolute bottom-2 left-2 rounded bg-black/60 px-2 py-1 text-xs text-white">Arahkan kamera ke QR pada halaman tanda tangan…</p>
               </div>
-              <button className="btn btn-ghost w-full justify-center !border-[var(--err-line)] !text-[var(--err-ink)]" onClick={stopScan}>■ Hentikan scan</button>
+              <button className="btn btn-ghost w-full justify-center !border-[var(--err-line)] !text-[var(--err-ink)]" onClick={stopScan}>
+                <Square size={13} aria-hidden /> Hentikan scan
+              </button>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <span className="stamp !rotate-0" style={{ color: "var(--ink-soft)" }}>📷</span>
+              <span className="stamp !rotate-0 inline-flex items-center" style={{ color: "var(--ink-soft)" }}>
+                <Camera size={26} aria-hidden />
+              </span>
               <p className="text-sm text-[var(--ink-soft)]">Kamera mati. Tekan tombol di bawah untuk mulai memindai QR-Code pada dokumen tercetak/layar lain.</p>
-              <button className="btn btn-ghost" onClick={startScan}>▶ Mulai scan QR</button>
+              <button className="btn btn-ghost" onClick={startScan}>
+                <Play size={13} aria-hidden /> Mulai scan QR
+              </button>
             </div>
           )}
         </Panel>
@@ -119,7 +126,9 @@ export default function VerifyPage() {
             <ul className="mt-4 space-y-2">
               {result.signers.map((s, i) => (
                 <li key={i} className="rounded-lg border border-[var(--line)] bg-white/70 p-3">
-                  <span className={s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}>{s.valid ? "✓" : "✗"}</span>{" "}
+                  <span className={s.valid ? "inline-flex text-[var(--ok-ink)]" : "inline-flex text-[var(--err-ink)]"}>
+                    {s.valid ? <Check size={14} strokeWidth={3} aria-hidden /> : <X size={14} strokeWidth={3} aria-hidden />}
+                  </span>{" "}
                   <b>{s.signer.signerName}</b>
                   <span className="mono text-xs text-[var(--ink-soft)]"> — {s.signer.signerRole}, {s.signer.institution}</span>
                   <span className="mt-1 block text-xs text-[var(--ink-soft)]">
