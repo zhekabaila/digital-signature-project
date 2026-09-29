@@ -6,8 +6,8 @@ Proyek Tugas Kriptografi (Topik D) · Mata kuliah Keamanan Informasi · Universi
 
 | Nama | NPM | Peran |
 |---|---|---|
+| _(Raden Annisa Dwi Mulyana)_ | _(247006111010)_ | Pengujian |
 | _(Shafa Rabbani Fityatul Mukarramah)_ | _(247006111020)_ | User Interface |
-| _(Raden Anissa)_ | _(247006111021)_ | Pengujian |
 | _(Zheka Baila Arkan)_ | _(247006111152)_ | Logic |
 
 > Ganti tabel ini dengan data anggota kelompok sebelum submit.
