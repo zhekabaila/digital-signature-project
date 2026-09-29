@@ -16,6 +16,7 @@ export async function parseSignForm(request: Request) {
     privateKeyDer,
     publicKeyPem,
     pdfBytes: Buffer.from(await doc.arrayBuffer()),
+    fileName: doc.name,
     iterations: Math.min(500, Math.max(1, Number(form.get("iterations")) || 30)),
     meta: {
       signerName: String(form.get("signerName") ?? ""),

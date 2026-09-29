@@ -36,7 +36,7 @@ export default function KeygenPage() {
   return (
     <div>
       <PageHead
-        step="Langkah 01 — Keygen"
+        step="Langkah 01 — Pembuatan Kunci"
         title="Buat pasangan kunci ECDSA P-256"
         sub="Private key langsung dienkripsi AES-256-GCM dengan key yang diturunkan dari passphrase via scrypt, lalu diunduh sebagai file .dsk. Public key (SPKI/PEM) bebas dibagikan ke siapa pun yang perlu memverifikasi tanda tangan Anda."
       />
