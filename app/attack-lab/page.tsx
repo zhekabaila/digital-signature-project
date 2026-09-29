@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Timer, PenLine, KeyRound, QrCode, Download, Check, X } from "lucide-react";
+import { Timer, PenLine, KeyRound, QrCode, Download, Check, X, Gauge } from "lucide-react";
 import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
-type Row = { skenario: string; dokumen: string; hasil: "LOLOS" | "DITOLAK"; detail: string };
+type Row = { skenario: string; dokumen: string; hasil: "LOLOS" | "DITOLAK" | "TERUKUR"; detail: string };
 
 const ms = (v: number) => `${v.toFixed(2)} ms`;
 const size = (v: number) => `${v.toLocaleString("id-ID")} B (${(v / 1024).toFixed(1)} KB)`;
@@ -53,9 +53,9 @@ export default function AttackLabPage() {
       if (!r.ok) throw new Error(j.error);
       setBmResult(j);
       addRow({
-        skenario: "Benchmark timing",
+        skenario: "Uji performa (benchmark)",
         dokumen: bmDoc.name,
-        hasil: "LOLOS",
+        hasil: "TERUKUR",
         detail: `sign avg ${j.avgSignMs.toFixed(2)} ms · verify avg ${j.avgVerifyMs.toFixed(2)} ms · sig ${j.signatureSizeBytes} B · pubkey ${j.publicKeySizeBytes} B · n=${j.iterations}`,
       });
     } catch (e) { setErr((e as Error).message); } finally { setBusy(""); }
@@ -275,10 +275,19 @@ export default function AttackLabPage() {
                       <td className="py-2.5 pr-3 font-medium whitespace-nowrap">{r.skenario}</td>
                       <td className="mono py-2.5 pr-3 text-xs whitespace-nowrap">{r.dokumen}</td>
                       <td className="py-2.5 pr-3">
-                        <span className={`mono inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${r.hasil === "LOLOS" ? "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]" : "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]"}`}>
-                          {r.hasil === "LOLOS" ? <Check size={11} strokeWidth={3} aria-hidden /> : <X size={11} strokeWidth={3} aria-hidden />}
-                          {r.hasil === "LOLOS" ? "DITOLAK SISTEM" : "LULUS (BAHAYA)"}
-                        </span>
+                        {(() => {
+                          const view = r.hasil === "LOLOS"
+                            ? { cls: "border-[var(--ok-line)] bg-[var(--ok-bg)] text-[var(--ok-ink)]", icon: <Check size={11} strokeWidth={3} aria-hidden />, label: "DITOLAK SISTEM" }
+                            : r.hasil === "DITOLAK"
+                              ? { cls: "border-[var(--err-line)] bg-[var(--err-bg)] text-[var(--err-ink)]", icon: <X size={11} strokeWidth={3} aria-hidden />, label: "LULUS (BAHAYA)" }
+                              : { cls: "border-[var(--line-strong)] bg-white/60 text-[var(--ink-soft)]", icon: <Gauge size={11} aria-hidden />, label: "TERUKUR" };
+                          return (
+                            <span className={`mono inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap ${view.cls}`}>
+                              {view.icon}
+                              {view.label}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td className="mono py-2.5 text-[11px] leading-4 text-[var(--ink-soft)]">{r.detail}</td>
                     </tr>
