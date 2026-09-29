@@ -1,5 +1,5 @@
 /**
- * Penyimpanan IN-MEMORI sementara untuk alur multi-signer (§4: GET
+ * Penyimpanan IN-MEMORI sementara untuk alur multi-signer (endpoint GET
  * /api/multi-sign/status?docId=...). Dokumen TIDAK pernah disimpan di disk;
  * isi memori hilang saat server restart — cukup untuk demo perkuliahan.
  * Private key tidak pernah menyentuh store ini.

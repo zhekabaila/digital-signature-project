@@ -3,8 +3,8 @@ import { verifyAllSignatures, verifyQrPayload } from "@/lib/pdf/multi-signer";
 export const runtime = "nodejs";
 
 /**
- * TASK.md §3.3 — terima PDF bertanda tangan ATAU qrPayload hasil scan kamera.
- * Opsi publicKeyPem untuk uji "kunci tidak cocok" (§3.5).
+ * terima PDF bertanda tangan ATAU qrPayload hasil scan kamera.
+ * Opsi publicKeyPem untuk uji "kunci tidak cocok".
  */
 export async function POST(request: Request) {
   const form = await request.formData();

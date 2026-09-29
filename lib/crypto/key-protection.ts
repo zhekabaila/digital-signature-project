@@ -11,7 +11,8 @@ function deriveKey(passphrase: string, salt: Buffer): Buffer {
 }
 
 /**
- * TASK.md §3.1 — private key DER dienkripsi AES-256-GCM dengan key dari scrypt(passphrase).
+ * Private key DER dienkripsi AES-256-GCM dengan key yang diturunkan dari
+ * passphrase via scrypt.
  * Format file: base64( "DSG1" | salt(16) | iv(12) | authTag(16) | ciphertext ).
  * Private key plaintext TIDAK PERNAH ditulis ke disk.
  */

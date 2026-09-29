@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fraunces, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import SiteNav from "@/components/site-nav";
+import { PenLine } from "lucide-react";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -25,8 +26,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--paper)]/92 backdrop-blur-sm">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3">
             <Link href="/" className="flex items-center gap-3">
-              <span className="stamp !border-[var(--seal)] !text-[var(--seal)] px-2.5 py-0.5 !text-sm !font-black !tracking-widest" aria-hidden>
-                ✒
+              <span className="stamp flex items-center !border-[var(--seal)] !text-[var(--seal)] px-2.5 py-0.5 !text-sm !font-black !tracking-widest" aria-hidden>
+                <PenLine size={14} />
               </span>
               <span>
                 <span className="block font-[family-name:var(--font-display)] text-lg font-bold leading-tight tracking-tight">

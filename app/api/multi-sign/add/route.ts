@@ -6,7 +6,7 @@ import { randomUUID } from "node:crypto";
 export const runtime = "nodejs";
 
 /**
- * TASK.md §3.4 — tambah tanda tangan pada dokumen yang SUDAH bertanda tangan.
+ * tambah tanda tangan pada dokumen yang SUDAH bertanda tangan.
  * Alur sama dengan /api/sign karena chained: hash signer baru otomatis mencakup
  * seluruh signature sebelumnya (dibaca dari metadata /DSig).
  */

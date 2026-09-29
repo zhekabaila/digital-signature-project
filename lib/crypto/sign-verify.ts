@@ -26,7 +26,7 @@ export function signData(
   return sign("sha256", data, key);
 }
 
-/** Verifikasi signature terhadap public key SPKI/PEM. false = tidak cocok (TASK.md §3.3 lapis 2). */
+/** Verifikasi signature terhadap public key SPKI/PEM. false = tidak cocok (lapis kedua: keaslian kunci). */
 export function verifySignature(
   data: Buffer | Uint8Array,
   signature: Buffer | Uint8Array,
@@ -40,7 +40,7 @@ export function verifySignature(
 }
 
 /**
- * Helper attack-lab (TASK.md §3.5): tanda tangani data dengan private key SEMBARANGAN
+ * Helper attack-lab: tanda tangani data dengan private key SEMBARANGAN
  * (bukan pasangan public key yang dipakai verifier) → menghasilkan signature invalid.
  */
 export function forgeSignatureWithRandomKey(data: Buffer | Uint8Array): Buffer {

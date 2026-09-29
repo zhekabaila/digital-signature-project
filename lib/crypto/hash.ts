@@ -11,7 +11,7 @@ export function sha256Digest(data: Buffer | Uint8Array): Buffer {
 }
 
 /**
- * Hash dokumen inti (TASK.md §3.4 Opsi A — chained):
+ * Hash dokumen inti (skema chained — desain multi-signer Opsi A):
  *   digest_i = SHA256( byte konten kanonik PDF || signature_signer_1 || ... || signature_signer_{i-1} )
  * `prevSignatures` kosong untuk penandatangan pertama.
  */

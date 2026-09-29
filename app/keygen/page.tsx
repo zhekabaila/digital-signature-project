@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Check, Download } from "lucide-react";
 import { PageHead, Panel, TextField, Banner, CopyChip, download } from "@/components/ui";
 
 export default function KeygenPage() {
@@ -62,7 +63,10 @@ export default function KeygenPage() {
           {result ? (
             <div className="space-y-4">
               <div className="rounded-lg border border-[var(--ok-line)] bg-[var(--ok-bg)] p-3 text-sm text-[var(--ok-ink)]">
-                ✓ KeyPair berhasil dibuat
+                <p className="flex items-center gap-1.5">
+                  <Check size={14} strokeWidth={3} aria-hidden />
+                  KeyPair berhasil dibuat
+                </p>
                 <p className="mono mt-1 text-[11px]">fingerprint: {result.fingerprint}</p>
               </div>
               <div>
@@ -70,8 +74,12 @@ export default function KeygenPage() {
                 <pre className="mono max-h-28 overflow-auto rounded-md border border-[var(--line)] bg-white px-3 py-2 text-[11px] leading-4">{result.publicKeyPem}</pre>
               </div>
               <div className="flex flex-wrap gap-2">
-                <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => download("public-key.pem", result.publicKeyPem)}>⬇ public-key.pem</button>
-                <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => download("private-key.dsk", result.encryptedPrivateKeyFile)}>⬇ private-key.dsk</button>
+                <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => download("public-key.pem", result.publicKeyPem)}>
+                  <Download size={13} aria-hidden /> public-key.pem
+                </button>
+                <button className="btn btn-ghost !px-3 !py-1.5 text-xs" onClick={() => download("private-key.dsk", result.encryptedPrivateKeyFile)}>
+                  <Download size={13} aria-hidden /> private-key.dsk
+                </button>
                 <CopyChip text={result.publicKeyPem} label="salin PEM" />
               </div>
             </div>

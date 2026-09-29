@@ -16,7 +16,7 @@ export function fingerprintFromPublicKeyPem(publicKeyPem: string): string {
   return sha256Hex(der).slice(0, 16);
 }
 
-/** TASK.md §3.1 — generate keypair ECDSA P-256. */
+/** Generate pasangan kunci ECDSA P-256. */
 export function generateKeypair(): KeyPairResult {
   const { publicKey, privateKey } = generateKeyPairSync("ec", {
     namedCurve: "P-256",
@@ -32,7 +32,7 @@ export function generateKeypair(): KeyPairResult {
 
 /**
  * Load private key PKCS#8 DER (hasil decryptPrivateKey) menjadi KeyObject siap pakai.
- * Private key plaintext hanya hidup di memory selama sign() — lihat §8 TASK.md.
+ * Private key plaintext hanya hidup di memory selama sign() — jangan pernah ditulis ke disk.
  */
 export function loadPrivateKey(der: Buffer) {
   return createPrivateKey({ key: der, format: "der", type: "pkcs8" });
@@ -45,7 +45,7 @@ export function loadPublicKey(pem: string) {
 /**
  * Bungkus privat+publik dalam SATU file terenkripsi (public key ikut di dalam
  * karena payload QR/metadata saat sign membutuhkan pasangan publiknya).
- * Struktur plaintext hanya hidup sesaat dalam memori (TASK.md §8).
+ * Struktur plaintext hanya hidup sesaat dalam memori.
  */
 export function exportEncryptedKeyBundle(passphrase: string): {
   bundleFile: string;

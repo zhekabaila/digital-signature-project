@@ -4,7 +4,7 @@ import { verifyAllSignatures } from "@/lib/pdf/multi-signer";
 export const runtime = "nodejs";
 
 /**
- * TASK.md §4: GET /api/multi-sign/status?docId=... → daftar signer + status.
+ * GET /api/multi-sign/status?docId=... → daftar signer + status.
  * docId dikembalikan oleh /api/sign dan /api/multi-sign/add (header X-Document-Id).
  * Dokumen disimpan HANYA di memori sesi (lihat sign-session-store.ts).
  */

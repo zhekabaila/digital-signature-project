@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Stamp } from "lucide-react";
 import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 export default function SignPage() {
@@ -48,7 +49,7 @@ export default function SignPage() {
       <PageHead
         step="Langkah 02 — Sign"
         title="Bubuhkan tanda tangan ke dokumen PDF"
-        sub="Private key didekripsi dengan passphrase → konten dokumen di-hash dengan SHA-256 → signature ECDSA P-256 dibuat atas hash + identitas signer → QR-Code metadata ditempel sebagai halaman baru. Hash dihitung sebelum QR ditempel, agar verifikasi tidak salah tuduh."
+        sub="Private key didekripsi dengan passphrase, konten dokumen di-hash dengan SHA-256, signature ECDSA P-256 dibuat atas hash + identitas signer, lalu QR-Code metadata ditempel sebagai halaman baru. Hash dihitung sebelum QR ditempel, agar verifikasi tidak salah tuduh."
       />
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel title="Berkas" desc="Dua file ini berpasangan: .dsk hasil keygen + PDF yang akan ditandatangani.">
@@ -66,7 +67,7 @@ export default function SignPage() {
               <TextField label="Institusi" value={fields.institution} onChange={set("institution")} placeholder="Universitas Siliwangi" />
             </div>
             <button className="btn btn-seal w-full justify-center" onClick={sign} disabled={busy}>
-              {busy ? "Menandatangani…" : "⑂ Sign & Unduh PDF + QR"}
+              {busy ? "Menandatangani…" : (<><Stamp size={15} aria-hidden /> Sign & Unduh PDF + QR</>)}
             </button>
             {status && <Banner tone={status.ok ? "ok" : "err"}>{status.msg}</Banner>}
           </div>

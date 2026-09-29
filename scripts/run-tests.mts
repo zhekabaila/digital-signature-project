@@ -1,5 +1,5 @@
 /**
- * Jalankan SELURUH pengujian wajib TASK.md §3.5 pada 5 dokumen data-uji:
+ * Jalankan SELURUH pengujian wajib pada 5 dokumen data-uji:
  *  - timing sign/verify rata-rata 30 percobaan
  *  - ukuran signature & public key
  *  - uji tamper, uji kunci salah, uji QR dipalsukan
@@ -88,7 +88,7 @@ await writeFile(path.join(OUT, "hasilmengujian.json"), JSON.stringify(rows, null
 // markdown
 const headers = Object.keys(rows[0]);
 const md = [
-  "# Hasil Pengujian Wajib (TASK.md §3.5)",
+  "# Hasil Pengujian Wajib",
   "",
   `ECDSA P-256 · SHA-256 · Node.js ${process.version} · ${ITERATIONS} percobaan per dokumen · digenerate: ${new Date().toISOString()}`,
   "",

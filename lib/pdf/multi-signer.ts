@@ -18,7 +18,7 @@ export interface SignerMeta {
   timestamp: string;
 }
 
-/** Payload yang ditanam di QR-Code DAN di metadata PDF (TASK.md §3.2). */
+/** Payload yang ditanam di QR-Code DAN di metadata PDF. */
 export interface SignerPayload {
   signerName: string;
   signerRole: string;
@@ -55,7 +55,7 @@ export function metaSignableBytes(p: Pick<SignerPayload, "signerName" | "signerR
 }
 
 /**
- * DATA utuh yang ditandatangani signer ke-i (TASK.md §3.4 Opsi A — chained):
+ * DATA utuh yang ditandatangani signer ke-i (skema chained — desain multi-signer Opsi A):
  *   SHA256(kanonik PDF || sig_1 || ... || sig_{i-1})  ||  metaBytes
  */
 function signingDataFor(
@@ -133,7 +133,7 @@ export interface VerifyResult {
 }
 
 /**
- * Verifikasi SEMUA tanda tangan pada PDF (TASK.md §3.3 + §3.4):
+ * Verifikasi SEMUA tanda tangan pada PDF (dua lapis: integritas dokumen + keaslian kunci):
  *  1) hitung ulang hash kanonik → beda = dokumen diubah (lapis tolak 1)
  *  2) verifySignature per signer dengan publicKeyPem override (uji kunci salah)
  *     atau publicKeyPem bawaan payload (lapis tolak 2)

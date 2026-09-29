@@ -7,7 +7,7 @@ import { makeTestPdf, DEMO_META } from "./helpers";
 
 const meta = (name: string, ts: string) => ({ ...DEMO_META, signerName: name, timestamp: ts });
 
-describe("multi-penandatangan chained (TASK.md §3.4 Opsi A)", () => {
+describe("multi-penandatangan chained (desain Opsi A)", () => {
   it("3 signer berurutan → semua tervalidasi, urutan tersimpan", async () => {
     const kps = [generateKeypair(), generateKeypair(), generateKeypair()];
     let bytes = await makeTestPdf();

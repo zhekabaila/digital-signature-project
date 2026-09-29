@@ -3,9 +3,9 @@ import ExcelJS from "exceljs";
 export const runtime = "nodejs";
 
 /**
- * TASK.md §3.5 "kumpulkan semua hasil ke tabel → tampilkan di UI → export XLSX".
+ * "kumpulkan semua hasil ke tabel → tampilkan di UI → export XLSX".
  * Menerima { title, headers: string[], rows: (string|number)[][] } → file .xlsx.
- * (Endpoint pendukung UI; tambahan kecil di luar daftar §2 karena kebutuhan ekspor wajib §3.5.)
+ * (Endpoint pendukung UI; ditambahkan karena hasil pengujian wajib dapat diekspor.)
  */
 export async function POST(request: Request) {
   const { title, headers, rows } = (await request.json()) as {

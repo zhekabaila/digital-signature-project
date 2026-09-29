@@ -46,7 +46,7 @@ describe("sign/verify tingkat primitif (ECDSA P-256)", () => {
   });
 });
 
-describe("alur sign → verify dokumen PDF lengkap (TASK.md §3.2–3.3)", () => {
+describe("alur sign → verify dokumen PDF lengkap", () => {
   it("PDF ditandatangani lalu diverifikasi → valid, metadata signer muncul", async () => {
     const kp = generateKeypair();
     const pdf = await makeTestPdf();
