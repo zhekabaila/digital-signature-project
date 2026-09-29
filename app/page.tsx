@@ -3,27 +3,27 @@ import { ArrowRight } from "lucide-react";
 
 const MODES = [
   {
-    href: "/keygen", num: "01", title: "Keygen",
+    href: "/keygen", num: "01", title: "Pembuatan Kunci",
     desc: "Pasangan kunci ECDSA P-256. Private key terenkripsi AES-256-GCM (scrypt) — tidak pernah ada sebagai plaintext.",
     meta: ["passphrase", ".dsk + public-key.pem"],
   },
   {
-    href: "/sign", num: "02", title: "Sign",
+    href: "/sign", num: "02", title: "Tanda Tangan",
     desc: "Unggah PDF + kunci terenkripsi + passphrase. Hash SHA-256 konten ditandatangani, QR-Code metadata menempel sebagai halaman tanda tangan.",
     meta: ["PDF", "SHA-256", "ECDSA", "QR"],
   },
   {
-    href: "/verify", num: "03", title: "Verify",
+    href: "/verify", num: "03", title: "Verifikasi",
     desc: "Unggah PDF atau scan QR langsung dari kamera. Menolak dokumen yang diubah DAN kunci yang tidak cocok — dua lapis pemeriksaan terpisah.",
     meta: ["hash match + signature match"],
   },
   {
-    href: "/multi-sign", num: "04", title: "Multi-Signer",
+    href: "/multi-sign", num: "04", title: "Tanda Tangan Ganda",
     desc: "Chained integrity: tanda tangan signer berikutnya mengunci seluruh signature sebelumnya. Urutan tidak bisa diubah atau dilewati.",
     meta: ["SHA256(doc ‖ sig₁ ‖ … ‖ sigᵢ₋₁)"],
   },
   {
-    href: "/attack-lab", num: "05", title: "Attack Lab",
+    href: "/attack-lab", num: "05", title: "Pengujian",
     desc: "Benchmark ≥30 percobaan, uji tamper satu karakter, uji kunci salah, uji QR dipalsukan. Tabel hasil siap diekspor ke XLSX.",
     meta: ["timing · tamper · wrong-key · forged-QR"],
   },

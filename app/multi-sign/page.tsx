@@ -60,7 +60,8 @@ export default function MultiSignPage() {
       }
       const id = r.headers.get("X-Document-Id") ?? "";
       const blob = await r.blob();
-      setDocBlob({ blob, label: `multi-signed-${sigCount + 1}.pdf` });
+      const fileName = r.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ?? `multi-signed-${sigCount + 1}.pdf`;
+      setDocBlob({ blob, label: fileName });
       setSigCount((n) => n + 1);
       setDocId(id);
       setMsg({ ok: true, text: `Signer "${fields.signerName}" berhasil menambahkan tanda tangan (ke-${sigCount + 1}).` });
@@ -82,7 +83,7 @@ export default function MultiSignPage() {
   return (
     <div>
       <PageHead
-        step="Langkah 04 — Multi-sign"
+        step="Langkah 03 — Tanda Tangan Ganda"
         title="Beberapa signer, satu rantai tanda tangan"
         sub="Setiap signer menandatangani SHA-256(dokumen asli ‖ seluruh signature sebelumnya). Urutan tanda tangan terkunci — signer ke-2 tidak bisa disisipkan sebelum signer ke-1, dan membuang/mengubah urutan membuat verifikasi gagal."
       />

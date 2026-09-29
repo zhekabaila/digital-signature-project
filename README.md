@@ -24,7 +24,7 @@ Proyek Tugas Kriptografi (Topik D) · Mata kuliah Keamanan Informasi · Universi
   unggah PDF **atau** scan QR langsung dari kamera browser (jsQR).
 - **Multi-penandatangan chained** (desain Opsi A): `hash signer-i = SHA256(dokumen_asli ‖ sig_1 ‖ … ‖ sig_{i-1})`
   → urutan tanda tangan tidak bisa diubah/dilewati.
-- **Attack lab & pengujian wajib**: benchmark ≥30 percobaan sign/verify, ukuran
+- **Pengujian & pengujian wajib**: benchmark ≥30 percobaan sign/verify, ukuran
   signature/public key, uji tamper, uji kunci salah, uji QR dipalsukan — tabel hasil +
   ekspor XLSX.
 

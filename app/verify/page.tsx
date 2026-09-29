@@ -73,7 +73,7 @@ export default function VerifyPage() {
   return (
     <div>
       <PageHead
-        step="Langkah 03 — Verify"
+        step="Langkah 03 — Verifikasi"
         title="Periksa keaslian dokumen"
         sub="Verifikasi dua lapis: hash dokumen tidak cocok berarti “dokumen diubah”; signature tidak cocok dengan public key berarti “kunci tidak cocok”. Unggah public key pihak lain secara opsional untuk menguji penolakan kunci salah."
       />

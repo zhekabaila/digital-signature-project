@@ -24,7 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="id" className={`${fraunces.variable} ${plex.variable} ${plexMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--paper)]/92 backdrop-blur-sm">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-6 py-3">
             <Link href="/" className="flex items-center gap-3">
               <span className="stamp flex items-center !border-[var(--seal)] !text-[var(--seal)] px-2.5 py-0.5 !text-sm !font-black !tracking-widest" aria-hidden>
                 <PenLine size={14} />
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <SiteNav />
           </div>
         </header>
-        <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-10">{children}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 px-6 py-10">{children}</main>
         <footer className="border-t border-dashed border-[var(--line-strong)] py-5 text-center">
           <p className="mono text-[11px] uppercase tracking-[0.16em] text-[var(--ink-soft)]">
             Keamanan Informasi · Universitas Siliwangi — kunci privat selalu terenkripsi, tidak ada secret di kode

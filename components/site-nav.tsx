@@ -5,11 +5,11 @@ import { usePathname } from "next/navigation";
 import { Home } from "lucide-react";
 
 export const FLOW = [
-  { href: "/keygen", num: "01", label: "Keygen" },
-  { href: "/sign", num: "02", label: "Sign" },
-  { href: "/verify", num: "03", label: "Verify" },
-  { href: "/multi-sign", num: "04", label: "Multi-Signer" },
-  { href: "/attack-lab", num: "05", label: "Attack Lab" },
+  { href: "/keygen", num: "01", label: "Pembuatan Kunci" },
+  { href: "/sign", num: "02", label: "Tanda Tangan" },
+  { href: "/verify", num: "03", label: "Verifikasi" },
+  { href: "/multi-sign", num: "04", label: "Tanda Tangan Ganda" },
+  { href: "/attack-lab", num: "05", label: "Pengujian" },
 ];
 
 export default function SiteNav() {

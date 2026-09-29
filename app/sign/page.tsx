@@ -31,12 +31,13 @@ export default function SignPage() {
         throw new Error(j.error ?? r.statusText);
       }
       const blob = await r.blob();
+      const fileName = r.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ?? "signed-document.pdf";
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "signed-document.pdf";
+      a.download = fileName;
       a.click();
       URL.revokeObjectURL(a.href);
-      setStatus({ ok: true, msg: `Dokumen tertanda terunduh (${(blob.size / 1024).toFixed(1)} KB) — QR-Code signer "${fields.signerName}" tertanam di halaman terakhir.` });
+      setStatus({ ok: true, msg: `Dokumen "${fileName}" tertanda terunduh (${(blob.size / 1024).toFixed(1)} KB) — QR-Code signer "${fields.signerName}" tertanam di halaman terakhir.` });
     } catch (e) {
       setStatus({ ok: false, msg: (e as Error).message });
     } finally {
@@ -47,7 +48,7 @@ export default function SignPage() {
   return (
     <div>
       <PageHead
-        step="Langkah 02 — Sign"
+        step="Langkah 02 — Tanda Tangan"
         title="Bubuhkan tanda tangan ke dokumen PDF"
         sub="Private key didekripsi dengan passphrase, konten dokumen di-hash dengan SHA-256, signature ECDSA P-256 dibuat atas hash + identitas signer, lalu QR-Code metadata ditempel sebagai halaman baru. Hash dihitung sebelum QR ditempel, agar verifikasi tidak salah tuduh."
       />

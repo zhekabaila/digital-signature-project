@@ -1,6 +1,7 @@
 import { signDocument } from "@/lib/pdf/multi-signer";
 import { putDocument } from "@/lib/pdf/sign-session-store";
 import { parseSignForm } from "@/lib/server/sign-form";
+import { signedFileName } from "@/lib/server/signed-filename";
 import { randomUUID } from "node:crypto";
 
 export const runtime = "nodejs";
@@ -26,11 +27,12 @@ export async function POST(request: Request) {
     );
     ctx.privateKeyDer.fill(0); // buang plaintext private key dari memori segera
     const docId = randomUUID();
-    putDocument(docId, signedPdfBytes, "signed-document.pdf");
+    const fileName = signedFileName(ctx.fileName, "signed");
+    putDocument(docId, signedPdfBytes, fileName);
     return new Response(new Uint8Array(signedPdfBytes), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="signed-document.pdf"`,
+        "Content-Disposition": `attachment; filename="${fileName}"`,
         "X-Document-Id": docId,
       },
     });

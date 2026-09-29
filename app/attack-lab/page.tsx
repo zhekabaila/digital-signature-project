@@ -6,6 +6,11 @@ import { PageHead, Panel, FileField, TextField, Banner } from "@/components/ui";
 
 type Row = { skenario: string; dokumen: string; hasil: "LOLOS" | "DITOLAK"; detail: string };
 
+const ms = (v: number) => `${v.toFixed(2)} ms`;
+const size = (v: number) => `${v.toLocaleString("id-ID")} B (${(v / 1024).toFixed(1)} KB)`;
+const thCls = (extra = "") => `mono text-[10px] uppercase tracking-[0.14em] text-[var(--ink-soft)] border-b-2 border-[var(--line-strong)] py-2 pr-3 text-left whitespace-nowrap ${extra}`;
+const tdCls = (extra = "") => `py-2 pr-3 text-xs whitespace-nowrap ${extra}`;
+
 async function verifyFile(f: Blob, name: string, extra?: Record<string, string>) {
   const fd = new FormData();
   fd.append("document", new File([f], name, { type: "application/pdf" }));
@@ -109,7 +114,7 @@ export default function AttackLabPage() {
       const doc = await loadPdf(new Uint8Array(await signedFile.arrayBuffer()));
       const info = readSignInfo(doc);
       if (!info?.signatures?.length) throw new Error("PDF tidak memiliki payload QR (metadata tanda tangan)");
-      const forged = { ...info.signatures[0], signerName: "Penyusup Attack Lab" };
+      const forged = { ...info.signatures[0], signerName: "Penyusup Pengujian" };
       const fd = new FormData();
       fd.append("qrPayload", JSON.stringify(forged));
       const r = await fetch("/api/verify", { method: "POST", body: fd });
@@ -144,7 +149,7 @@ export default function AttackLabPage() {
   return (
     <div>
       <PageHead
-        step="Langkah 05 — Attack Lab"
+        step="Langkah 05 — Pengujian"
         title="Uji keras: serang sistem sendiri"
         sub="Benchmark timing ≥30 percobaan, ukuran signature & public key, lalu tiga skenario serangan wajib: dokumen di-tamper, verifikasi dengan kunci salah, dan QR-Code dipalsukan. Setiap serangan yang LOLOS berarti sistem berhasil menolaknya."
       />
@@ -164,7 +169,68 @@ export default function AttackLabPage() {
             {busy === "benchmark" ? (<><Timer size={15} aria-hidden /> Mengukur…</>) : (<><Timer size={15} aria-hidden /> Jalankan Benchmark</>)}
           </button>
           {bmResult && (
-            <pre className="mono mt-4 max-h-48 overflow-auto rounded-md border border-[var(--line)] bg-white px-3 py-2 text-[11px] leading-4">{JSON.stringify(bmResult, null, 2)}</pre>
+            <div className="rise mt-5 space-y-5">
+              <div>
+                <p className="lbl">Waktu proses (milidetik, rata-rata {bmResult.iterations} iterasi)</p>
+                <div className="mt-2 overflow-x-auto rounded-md border border-[var(--line)] bg-white px-3 py-1">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="text-left">
+                        <th className={`${thCls()}`}>Operasi</th>
+                        <th className={`${thCls("text-right")}`}>Rata-rata</th>
+                        <th className={`${thCls("text-right")}`}>Tercepat</th>
+                        <th className={`${thCls("text-right")}`}>Terlama</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-[var(--line)]">
+                        <td className={tdCls()}>Sign (hash SHA-256 + ECDSA P-256)</td>
+                        <td className={`${tdCls("text-right")} font-semibold`}>{ms(bmResult.avgSignMs)}</td>
+                        <td className={`${tdCls("text-right")} text-[var(--ink-soft)]`}>{ms(bmResult.minSignMs)}</td>
+                        <td className={`${tdCls("text-right")} text-[var(--ink-soft)]`}>{ms(bmResult.maxSignMs)}</td>
+                      </tr>
+                      <tr>
+                        <td className={tdCls()}>Verifikasi (hash + signature)</td>
+                        <td className={`${tdCls("text-right")} font-semibold`}>{ms(bmResult.avgVerifyMs)}</td>
+                        <td className={`${tdCls("text-right")} text-[var(--ink-soft)]`}>{ms(bmResult.minVerifyMs)}</td>
+                        <td className={`${tdCls("text-right")} text-[var(--ink-soft)]`}>{ms(bmResult.maxVerifyMs)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div>
+                <p className="lbl">Ukuran artefak</p>
+                <div className="mt-2 overflow-x-auto rounded-md border border-[var(--line)] bg-white px-3 py-1">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="text-left">
+                        <th className={`${thCls()}`}>Artefak</th>
+                        <th className={`${thCls("text-right")}`}>Ukuran</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-[var(--line)]">
+                        <td className={tdCls()}>Signature ECDSA (DER)</td>
+                        <td className={`${tdCls("text-right")} font-semibold`}>{size(bmResult.signatureSizeBytes)}</td>
+                      </tr>
+                      <tr className="border-b border-[var(--line)]">
+                        <td className={tdCls()}>Public key (SPKI)</td>
+                        <td className={`${tdCls("text-right")} font-semibold`}>{size(bmResult.publicKeySizeBytes)}</td>
+                      </tr>
+                      <tr className="border-b border-[var(--line)]">
+                        <td className={tdCls()}>Dokumen asal</td>
+                        <td className={`${tdCls("text-right")} font-semibold`}>{size(bmResult.documentSizeBytes)}</td>
+                      </tr>
+                      <tr>
+                        <td className={tdCls()}>Dokumen tertanda (+ halaman QR)</td>
+                        <td className={`${tdCls("text-right")} font-semibold`}>{size(bmResult.signedDocumentSizeBytes)}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           )}
         </Panel>
 
