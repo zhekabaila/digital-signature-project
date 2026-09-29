@@ -64,7 +64,7 @@ export default function MultiSignPage() {
       setDocBlob({ blob, label: fileName });
       setSigCount((n) => n + 1);
       setDocId(id);
-      setMsg({ ok: true, text: `Signer "${fields.signerName}" berhasil menambahkan tanda tangan (ke-${sigCount + 1}).` });
+      setMsg({ ok: true, text: `Signer "${fields.signerName}" berhasil menambahkan tanda tangan (ke-${(signers?.length || sigCount) + 1}).` });
       await refreshStatus(id, blob);
     } catch (e) {
       setMsg({ ok: false, text: (e as Error).message });
@@ -114,7 +114,7 @@ export default function MultiSignPage() {
               <TextField label="Institusi" value={fields.institution} onChange={set("institution")} placeholder="Universitas Siliwangi" />
             </div>
             <button className="btn btn-seal w-full justify-center" onClick={addSigner} disabled={busy}>
-              {busy ? "Menambahkan tanda tangan…" : (<><Stamp size={15} aria-hidden /> Tanda Tangani (Signer ke-{sigCount + 1})</>)}
+              {busy ? "Menambahkan tanda tangan…" : (<><Stamp size={15} aria-hidden /> Tanda Tangani (Signer ke-{(signers?.length || sigCount) + 1})</>)}
             </button>
             {docId && signers.length > 0 && (
               <button className="btn btn-ghost w-full justify-center" onClick={() => refreshStatus(docId)}>
@@ -133,7 +133,7 @@ export default function MultiSignPage() {
               <p className="max-w-[26ch] text-sm italic text-[var(--ink-soft)]">Belum ada tanda tangan. Rantai akan terbentuk di sini setelah signer pertama membubuhkan tanda tangannya.</p>
             </div>
           ) : (
-            <ol className="space-y-3">
+            <ol className="space-y-3 max-h-[620px] overflow-y-auto">
               {signers.map((s, i) => (
                 <li key={i} className={`relative rounded-lg border p-3 pl-10 text-sm ${s.valid ? "border-[var(--ok-line)] bg-[var(--ok-bg)]" : "border-[var(--err-line)] bg-[var(--err-bg)]"}`}>
                   <span className={`mono absolute left-3 top-3 text-xs ${s.valid ? "text-[var(--ok-ink)]" : "text-[var(--err-ink)]"}`}>{String(i + 1).padStart(2, "0")}</span>
