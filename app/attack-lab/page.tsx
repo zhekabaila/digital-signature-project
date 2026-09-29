@@ -155,7 +155,7 @@ export default function AttackLabPage() {
       />
 
       <div className="space-y-6">
-        <Panel title="A · Benchmark sign & verify" desc="Mengukur rata-rata waktu sign/verify ECDSA P-256 atas dokumen yang sama, plus ukuran artefak kunci.">
+        <Panel title="A · Uji Performa Tanda Tangan & Verifikasi" desc="Mengukur rata-rata waktu sign/verify ECDSA P-256 atas dokumen yang sama, plus ukuran artefak kunci.">
           <div className="grid gap-4 sm:grid-cols-2">
             <FileField label="Dokumen uji" accept="application/pdf" onChange={setBmDoc} fileName={bmDoc?.name ?? null} hint="Belum ada PDF dipilih" />
             <FileField label="Private key .dsk" onChange={setBmKey} fileName={bmKey?.name ?? null} hint="Belum ada .dsk dipilih" />
@@ -166,7 +166,7 @@ export default function AttackLabPage() {
             </label>
           </div>
           <button className="btn btn-seal mt-4" onClick={runBenchmark} disabled={!!busy}>
-            {busy === "benchmark" ? (<><Timer size={15} aria-hidden /> Mengukur…</>) : (<><Timer size={15} aria-hidden /> Jalankan Benchmark</>)}
+            {busy === "benchmark" ? (<><Timer size={15} aria-hidden /> Mengukur…</>) : (<><Timer size={15} aria-hidden /> Jalankan Uji Performa</>)}
           </button>
           {bmResult && (
             <div className="rise mt-5 space-y-5">
@@ -234,7 +234,7 @@ export default function AttackLabPage() {
           )}
         </Panel>
 
-        <Panel title="B–D · Skenario serangan" desc="Satu PDF bertanda tangan dipakai untuk ketiga serangan. PDF dibuat di langkah Sign.">
+        <Panel title="B · Skenario Serangan" desc="Satu PDF bertanda tangan dipakai untuk ketiga serangan. PDF dibuat di langkah Sign.">
           <div className="space-y-4">
             <FileField label="PDF bertanda tangan" accept="application/pdf" onChange={setSignedFile} fileName={signedFile?.name ?? null} hint="Belum ada PDF tertanda dipilih" />
             <div className="flex flex-wrap gap-2">
